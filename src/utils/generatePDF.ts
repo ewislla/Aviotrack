@@ -1,3 +1,4 @@
+// @ts-ignore
 import html2pdf from 'html2pdf.js';
 import { Booking } from '../types';
 
