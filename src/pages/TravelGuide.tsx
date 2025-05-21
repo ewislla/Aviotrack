@@ -44,52 +44,45 @@ const TravelGuide = () => {
       title: 'Cultural Awareness',
       icon: <Globe2 className="h-6 w-6 text-blue-600" />,
       items: [
-        'Learn basic local phrases',
-        'Respect dress codes and customs',
-        'Be mindful of photography rules',
-        'Avoid offensive gestures or behavior',
+        'Learn key phrases in the local language',
+        'Respect local customs and traditions',
+        'Dress appropriately for the culture',
+        'Be mindful of body language and gestures',
+        'Support local businesses and artisans',
       ],
-      image: 'https://images.pexels.com/photos/3184192/pexels-photo-3184192.jpeg',
+      image: 'https://images.pexels.com/photos/3184436/pexels-photo-3184436.jpeg',
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 p-4">
+    <div className="grid gap-8 p-6">
       {tips.map((tip, index) => (
-        <div key={index} className="bg-white rounded-2xl shadow-md p-6">
-          <div className="flex items-center gap-3 mb-3">
+        <div key={index} className="bg-white p-4 shadow rounded-lg">
+          <div className="flex items-center gap-2 mb-2">
             {tip.icon}
-            <h3 className="text-xl font-semibold">{tip.title}</h3>
+            <h3 className="text-lg font-bold">{tip.title}</h3>
           </div>
-
-          {/* Render items if they exist */}
           {tip.items && (
-            <ul className="list-disc pl-6 text-sm text-gray-700 space-y-1 mb-3">
+            <ul className="list-disc list-inside text-sm text-gray-700">
               {tip.items.map((item, i) => (
                 <li key={i}>{item}</li>
               ))}
             </ul>
           )}
-
-          {/* Render content object if it exists */}
           {tip.content && (
-            <ul className="list-none pl-1 text-sm text-gray-700 space-y-1 mb-3">
-              {Object.entries(tip.content).map(([season, description]) => (
+            <ul className="list-disc list-inside text-sm text-gray-700">
+              {Object.entries(tip.content).map(([season, desc]) => (
                 <li key={season}>
-                  <strong>{season}:</strong> {description}
+                  <strong>{season}:</strong> {desc}
                 </li>
               ))}
             </ul>
           )}
-
-          {/* Optional: Render image */}
-          {tip.image && (
-            <img
-              src={tip.image}
-              alt={tip.title}
-              className="mt-3 rounded-xl w-full h-48 object-cover"
-            />
-          )}
+          <img
+            src={tip.image}
+            alt={tip.title}
+            className="mt-3 w-full h-48 object-cover rounded"
+          />
         </div>
       ))}
     </div>
