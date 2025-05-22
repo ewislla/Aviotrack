@@ -67,7 +67,7 @@ const Navbar = () => {
           >
             <Link to="/" className="flex items-center space-x-3">
               <img 
-                src="/logo.png" 
+                src="/assets/logo.png" 
                 alt="Avio Track Logo" 
                 className="h-12 w-auto"
               />
