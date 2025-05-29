@@ -1,4 +1,4 @@
-import { Flight, Booking, Seat } from './types';
+import { Flight, Booking, Seat, Destination, TripPlan } from './types';
 
 // Generate seat numbers for a flight
 const generateSeats = (economyPrice: number, businessPrice: number, firstClassPrice: number): Seat[] => {
@@ -46,11 +46,35 @@ const generateSeats = (economyPrice: number, businessPrice: number, firstClassPr
   return seats;
 };
 
+// Load destinations from localStorage or use default list
+const savedDestinations = localStorage.getItem('destinations');
+export const destinations: Destination[] = savedDestinations ? JSON.parse(savedDestinations) : [
+  { id: '1', code: 'JFK', city: 'New York', country: 'United States', isActive: true },
+  { id: '2', code: 'LAX', city: 'Los Angeles', country: 'United States', isActive: true },
+  { id: '3', code: 'LHR', city: 'London', country: 'United Kingdom', isActive: true },
+  { id: '4', code: 'CDG', city: 'Paris', country: 'France', isActive: true },
+  { id: '5', code: 'DXB', city: 'Dubai', country: 'United Arab Emirates', isActive: true }
+];
+
+// Save destinations to localStorage
+export const saveDestinations = (destinations: Destination[]) => {
+  localStorage.setItem('destinations', JSON.stringify(destinations));
+};
+
+// Load trip plans from localStorage or use empty array
+const savedTripPlans = localStorage.getItem('tripPlans');
+export const tripPlans: TripPlan[] = savedTripPlans ? JSON.parse(savedTripPlans) : [];
+
+// Save trip plans to localStorage
+export const saveTripPlans = (plans: TripPlan[]) => {
+  localStorage.setItem('tripPlans', JSON.stringify(plans));
+};
+
 // Load bookings from localStorage or use empty array
 const savedBookings = localStorage.getItem('bookings');
 export const mockBookings: Booking[] = savedBookings ? JSON.parse(savedBookings) : [];
 
-// Save bookings to localStorage whenever they change
+// Save bookings to localStorage
 export const saveBookings = (bookings: Booking[]) => {
   localStorage.setItem('bookings', JSON.stringify(bookings));
 };
@@ -60,7 +84,7 @@ export const mockFlights: Flight[] = [
     id: '1',
     airline: 'United Airlines',
     flightNumber: 'UA123',
-    origin: 'SFO',
+    origin: 'JFK',
     destination: 'LAX',
     scheduledDeparture: '2024-03-20T10:00:00',
     actualDeparture: '2024-03-20T10:15:00',
@@ -138,7 +162,7 @@ export const mockFlights: Flight[] = [
 const savedFlights = localStorage.getItem('flights');
 export const flights: Flight[] = savedFlights ? JSON.parse(savedFlights) : mockFlights;
 
-// Save flights to localStorage whenever they change
+// Save flights to localStorage
 export const saveFlights = (flights: Flight[]) => {
   localStorage.setItem('flights', JSON.stringify(flights));
 };
@@ -158,4 +182,52 @@ export const updateSeatStatus = (flightId: string, seatNumbers: string[], status
 
   flights[flightIndex] = updatedFlight;
   saveFlights(flights);
+};
+
+// Add new destination
+export const addDestination = (destination: Destination) => {
+  destinations.push(destination);
+  saveDestinations(destinations);
+};
+
+// Update destination
+export const updateDestination = (id: string, updates: Partial<Destination>) => {
+  const index = destinations.findIndex(d => d.id === id);
+  if (index !== -1) {
+    destinations[index] = { ...destinations[index], ...updates };
+    saveDestinations(destinations);
+  }
+};
+
+// Delete destination
+export const deleteDestination = (id: string) => {
+  const index = destinations.findIndex(d => d.id === id);
+  if (index !== -1) {
+    destinations.splice(index, 1);
+    saveDestinations(destinations);
+  }
+};
+
+// Add trip plan
+export const addTripPlan = (plan: TripPlan) => {
+  tripPlans.push(plan);
+  saveTripPlans(tripPlans);
+};
+
+// Update trip plan
+export const updateTripPlan = (id: string, updates: Partial<TripPlan>) => {
+  const index = tripPlans.findIndex(p => p.id === id);
+  if (index !== -1) {
+    tripPlans[index] = { ...tripPlans[index], ...updates };
+    saveTripPlans(tripPlans);
+  }
+};
+
+// Delete trip plan
+export const deleteTripPlan = (id: string) => {
+  const index = tripPlans.findIndex(p => p.id === id);
+  if (index !== -1) {
+    tripPlans.splice(index, 1);
+    saveTripPlans(tripPlans);
+  }
 };

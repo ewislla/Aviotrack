@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Table, Edit2, Save, X, Users, Plane, Plus, DollarSign } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { Table, Edit2, Save, X, Users, Plane, Plus, DollarSign, MapPin, Mail, Calendar, Check } from 'lucide-react';
+import Select from 'react-select';
 import { mockFlights, mockBookings, saveFlights } from '../data';
-import { Flight, Booking, NewFlight } from '../types';
+import { airports } from '../data/airports';
+import { Flight, Booking, NewFlight, FlightPlanRequest } from '../types';
+import { toast } from 'react-hot-toast';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'flights' | 'bookings'>('flights');
+  const [activeTab, setActiveTab] = useState<'flights' | 'bookings' | 'requests'>('flights');
   const [editingFlight, setEditingFlight] = useState<string | null>(null);
   const [editedFlightData, setEditedFlightData] = useState<Flight | null>(null);
   const [showAddFlight, setShowAddFlight] = useState(false);
@@ -32,6 +35,27 @@ const AdminDashboard = () => {
     firstClassPrice: 0
   });
 
+  const [flightPlanRequests, setFlightPlanRequests] = useState<FlightPlanRequest[]>([]);
+
+  useEffect(() => {
+    const requests = JSON.parse(localStorage.getItem('flightPlanRequests') || '[]');
+    setFlightPlanRequests(requests);
+  }, []);
+
+  const updateRequestStatus = (requestId: string, newStatus: FlightPlanRequest['status']) => {
+    const updatedRequests = flightPlanRequests.map(request => 
+      request.id === requestId ? { ...request, status: newStatus } : request
+    );
+    setFlightPlanRequests(updatedRequests);
+    localStorage.setItem('flightPlanRequests', JSON.stringify(updatedRequests));
+    toast.success('Request status updated');
+  };
+
+  const airportOptions = airports.map(airport => ({
+    value: airport.code,
+    label: `${airport.city} (${airport.code}) - ${airport.name}, ${airport.country}`
+  }));
+
   useEffect(() => {
     const isLoggedIn = localStorage.getItem('isAdminLoggedIn');
     if (!isLoggedIn) {
@@ -55,6 +79,7 @@ const AdminDashboard = () => {
       if (flightIndex !== -1) {
         mockFlights[flightIndex] = editedFlightData;
         saveFlights(mockFlights);
+        toast.success('Flight updated successfully');
       }
       setEditingFlight(null);
       setEditedFlightData(null);
@@ -66,15 +91,71 @@ const AdminDashboard = () => {
     setEditedFlightData(null);
   };
 
+  const generateSeats = (economyPrice: number, businessPrice: number, firstClassPrice: number) => {
+    const seats = [];
+    
+    // First Class (Rows 1-2)
+    for (let row = 1; row <= 2; row++) {
+      for (let col of ['A', 'C', 'D', 'F']) {
+        seats.push({
+          id: `${row}${col}`,
+          number: `${row}${col}`,
+          class: 'First Class',
+          status: 'Available',
+          price: firstClassPrice
+        });
+      }
+    }
+
+    // Business Class (Rows 3-7)
+    for (let row = 3; row <= 7; row++) {
+      for (let col of ['A', 'C', 'D', 'F']) {
+        seats.push({
+          id: `${row}${col}`,
+          number: `${row}${col}`,
+          class: 'Business',
+          status: 'Available',
+          price: businessPrice
+        });
+      }
+    }
+
+    // Economy Class (Rows 8-32)
+    for (let row = 8; row <= 32; row++) {
+      for (let col of ['A', 'B', 'C', 'D', 'E', 'F']) {
+        seats.push({
+          id: `${row}${col}`,
+          number: `${row}${col}`,
+          class: 'Economy',
+          status: 'Available',
+          price: economyPrice
+        });
+      }
+    }
+
+    return seats;
+  };
+
   const handleAddFlight = () => {
+    if (!newFlight.origin || !newFlight.destination) {
+      toast.error('Please select both origin and destination airports');
+      return;
+    }
+
+    if (newFlight.origin === newFlight.destination) {
+      toast.error('Origin and destination cannot be the same');
+      return;
+    }
+
     const flight: Flight = {
       id: Math.random().toString(36).substr(2, 9),
       ...newFlight,
       actualDeparture: '',
       actualArrival: '',
       status: 'On Time',
-      seats: []
+      seats: generateSeats(newFlight.economyPrice, newFlight.businessPrice, newFlight.firstClassPrice)
     };
+
     mockFlights.push(flight);
     saveFlights(mockFlights);
     setShowAddFlight(false);
@@ -92,6 +173,7 @@ const AdminDashboard = () => {
       businessPrice: 0,
       firstClassPrice: 0
     });
+    toast.success('Flight added successfully');
   };
 
   const openPriceModal = (flight: Flight) => {
@@ -115,21 +197,44 @@ const AdminDashboard = () => {
           firstClassPrice: prices.firstClass
         };
         saveFlights(mockFlights);
+        toast.success('Prices updated successfully');
       }
     }
     setShowPriceModal(false);
+  };
+
+  const getStatusColor = (status: FlightPlanRequest['status']) => {
+    switch (status) {
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'contacted':
+        return 'bg-blue-100 text-blue-800';
+      case 'completed':
+        return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <button
-          onClick={handleLogout}
-          className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
-        >
-          Logout
-        </button>
+        <div className="space-x-4">
+          <Link
+            to="/admin/airports"
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 inline-flex items-center space-x-2"
+          >
+            <MapPin className="h-5 w-5" />
+            <span>Manage Airports</span>
+          </Link>
+          <button
+            onClick={handleLogout}
+            className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
+          >
+            Logout
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-lg shadow-md">
@@ -156,6 +261,17 @@ const AdminDashboard = () => {
             >
               <Users className="h-5 w-5" />
               <span>Bookings</span>
+            </button>
+            <button
+              className={`px-6 py-3 flex items-center space-x-2 ${
+                activeTab === 'requests'
+                  ? 'border-b-2 border-blue-600 text-blue-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+              onClick={() => setActiveTab('requests')}
+            >
+              <Calendar className="h-5 w-5" />
+              <span>Flight Plan Requests</span>
             </button>
           </div>
         </div>
@@ -197,20 +313,22 @@ const AdminDashboard = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Origin</label>
-                  <input
-                    type="text"
-                    className="w-full border rounded-md px-3 py-2"
-                    value={newFlight.origin}
-                    onChange={(e) => setNewFlight({...newFlight, origin: e.target.value})}
+                  <Select
+                    options={airportOptions}
+                    value={airportOptions.find(option => option.value === newFlight.origin)}
+                    onChange={(option) => setNewFlight({...newFlight, origin: option?.value || ''})}
+                    className="text-sm"
+                    placeholder="Select origin airport"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Destination</label>
-                  <input
-                    type="text"
-                    className="w-full border rounded-md px-3 py-2"
-                    value={newFlight.destination}
-                    onChange={(e) => setNewFlight({...newFlight, destination: e.target.value})}
+                  <Select
+                    options={airportOptions}
+                    value={airportOptions.find(option => option.value === newFlight.destination)}
+                    onChange={(option) => setNewFlight({...newFlight, destination: option?.value || ''})}
+                    className="text-sm"
+                    placeholder="Select destination airport"
                   />
                 </div>
                 <div>
@@ -242,6 +360,7 @@ const AdminDashboard = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Gate</label>
+                
                   <input
                     type="text"
                     className="w-full border rounded-md px-3 py-2"
@@ -475,7 +594,7 @@ const AdminDashboard = () => {
                 </tbody>
               </table>
             </div>
-          ) : (
+          ) : activeTab === 'bookings' ? (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead>
@@ -514,6 +633,90 @@ const AdminDashboard = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {new Date(booking.timestamp).toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead>
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Name
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Contact
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Destination
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Dates
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Budget
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {flightPlanRequests.map((request) => (
+                    <tr key={request.id}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {request.name}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center space-x-2">
+                          <Mail className="h-4 w-4 text-gray-400" />
+                          <span>{request.email}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {request.destination}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div>
+                          <p className="text-sm text-gray-600">Start: {new Date(request.startDate).toLocaleDateString()}</p>
+                          <p className="text-sm text-gray-600">End: {new Date(request.endDate).toLocaleDateString()}</p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {request.budget}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(request.status)}`}>
+                          {request.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex space-x-2">
+                          {request.status === 'pending' && (
+                            <button
+                              onClick={() => updateRequestStatus(request.id, 'contacted')}
+                              className="text-blue-600 hover:text-blue-800"
+                              title="Mark as Contacted"
+                            >
+                              <Mail className="h-5 w-5" />
+                            </button>
+                          )}
+                          {request.status === 'contacted' && (
+                            <button
+                              onClick={() => updateRequestStatus(request.id, 'completed')}
+                              className="text-green-600 hover:text-green-800"
+                              title="Mark as Completed"
+                            >
+                              <Check className="h-5 w-5" />
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}

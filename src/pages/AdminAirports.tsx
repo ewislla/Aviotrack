@@ -1,0 +1,341 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Plane, Search, Plus, Edit2, Save, X, Trash2 } from 'lucide-react';
+import { toast } from 'react-hot-toast';
+import { Airport, airports as initialAirports } from '../data/airports';
+
+const AdminAirports = () => {
+  const navigate = useNavigate();
+  const [airports, setAirports] = useState<Airport[]>(() => {
+    const saved = localStorage.getItem('customAirports');
+    return saved ? JSON.parse(saved) : initialAirports;
+  });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [newAirport, setNewAirport] = useState<Omit<Airport, 'code'>>({
+    name: '',
+    city: '',
+    country: '',
+    latitude: 0,
+    longitude: 0
+  });
+  const [editAirport, setEditAirport] = useState<Airport | null>(null);
+
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem('isAdminLoggedIn');
+    if (!isLoggedIn) {
+      navigate('/admin/login');
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    localStorage.setItem('customAirports', JSON.stringify(airports));
+  }, [airports]);
+
+  const handleAddAirport = (e: React.FormEvent) => {
+    e.preventDefault();
+    const code = generateAirportCode(newAirport.city);
+    
+    if (airports.some(airport => airport.code === code)) {
+      toast.error('Airport with similar code already exists');
+      return;
+    }
+
+    const airport: Airport = {
+      code,
+      ...newAirport
+    };
+
+    setAirports([...airports, airport]);
+    setShowAddForm(false);
+    setNewAirport({
+      name: '',
+      city: '',
+      country: '',
+      latitude: 0,
+      longitude: 0
+    });
+    toast.success('Airport added successfully');
+  };
+
+  const handleEditAirport = (airport: Airport) => {
+    setEditingId(airport.code);
+    setEditAirport(airport);
+  };
+
+  const handleSaveEdit = () => {
+    if (!editAirport) return;
+
+    setAirports(airports.map(airport => 
+      airport.code === editingId ? editAirport : airport
+    ));
+    setEditingId(null);
+    setEditAirport(null);
+    toast.success('Airport updated successfully');
+  };
+
+  const handleDeleteAirport = (code: string) => {
+    if (window.confirm('Are you sure you want to delete this airport?')) {
+      setAirports(airports.filter(airport => airport.code !== code));
+      toast.success('Airport deleted successfully');
+    }
+  };
+
+  const generateAirportCode = (city: string): string => {
+    return city
+      .replace(/[^a-zA-Z]/g, '')
+      .slice(0, 3)
+      .toUpperCase();
+  };
+
+  const filteredAirports = airports.filter(airport =>
+    airport.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    airport.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    airport.country.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    airport.code.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">Airport Management</h1>
+        <button
+          onClick={() => setShowAddForm(true)}
+          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center space-x-2"
+        >
+          <Plus className="h-5 w-5" />
+          <span>Add Airport</span>
+        </button>
+      </div>
+
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="mb-6 flex items-center space-x-4">
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              placeholder="Search airports..."
+              className="w-full pl-10 pr-4 py-2 border rounded-lg"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          </div>
+          <div className="text-gray-600">
+            <Plane className="h-5 w-5 inline-block mr-2" />
+            {filteredAirports.length} airports
+          </div>
+        </div>
+
+        {showAddForm && (
+          <div className="mb-6 bg-gray-50 p-6 rounded-lg">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Add New Airport</h2>
+              <button
+                onClick={() => setShowAddForm(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <form onSubmit={handleAddAirport} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Airport Name</label>
+                <input
+                  type="text"
+                  required
+                  className="w-full px-3 py-2 border rounded-md"
+                  value={newAirport.name}
+                  onChange={(e) => setNewAirport({ ...newAirport, name: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                <input
+                  type="text"
+                  required
+                  className="w-full px-3 py-2 border rounded-md"
+                  value={newAirport.city}
+                  onChange={(e) => setNewAirport({ ...newAirport, city: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                <input
+                  type="text"
+                  required
+                  className="w-full px-3 py-2 border rounded-md"
+                  value={newAirport.country}
+                  onChange={(e) => setNewAirport({ ...newAirport, country: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Latitude</label>
+                <input
+                  type="number"
+                  required
+                  step="any"
+                  className="w-full px-3 py-2 border rounded-md"
+                  value={newAirport.latitude}
+                  onChange={(e) => setNewAirport({ ...newAirport, latitude: parseFloat(e.target.value) })}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Longitude</label>
+                <input
+                  type="number"
+                  required
+                  step="any"
+                  className="w-full px-3 py-2 border rounded-md"
+                  value={newAirport.longitude}
+                  onChange={(e) => setNewAirport({ ...newAirport, longitude: parseFloat(e.target.value) })}
+                />
+              </div>
+              <div className="md:col-span-2">
+                <button
+                  type="submit"
+                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+                >
+                  Add Airport
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Code
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Airport Name
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Location
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Coordinates
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredAirports.map((airport) => (
+                <tr key={airport.code}>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="font-mono text-sm">{airport.code}</span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {editingId === airport.code ? (
+                      <input
+                        type="text"
+                        className="w-full px-2 py-1 border rounded"
+                        value={editAirport?.name}
+                        onChange={(e) => setEditAirport(prev => prev ? { ...prev, name: e.target.value } : null)}
+                      />
+                    ) : (
+                      airport.name
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {editingId === airport.code ? (
+                      <div className="space-y-2">
+                        <input
+                          type="text"
+                          className="w-full px-2 py-1 border rounded"
+                          value={editAirport?.city}
+                          onChange={(e) => setEditAirport(prev => prev ? { ...prev, city: e.target.value } : null)}
+                        />
+                        <input
+                          type="text"
+                          className="w-full px-2 py-1 border rounded"
+                          value={editAirport?.country}
+                          onChange={(e) => setEditAirport(prev => prev ? { ...prev, country: e.target.value } : null)}
+                        />
+                      </div>
+                    ) : (
+                      <div>
+                        <div className="font-medium">{airport.city}</div>
+                        <div className="text-sm text-gray-500">{airport.country}</div>
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {editingId === airport.code ? (
+                      <div className="space-y-2">
+                        <input
+                          type="number"
+                          step="any"
+                          className="w-full px-2 py-1 border rounded"
+                          value={editAirport?.latitude}
+                          onChange={(e) => setEditAirport(prev => prev ? { ...prev, latitude: parseFloat(e.target.value) } : null)}
+                        />
+                        <input
+                          type="number"
+                          step="any"
+                          className="w-full px-2 py-1 border rounded"
+                          value={editAirport?.longitude}
+                          onChange={(e) => setEditAirport(prev => prev ? { ...prev, longitude: parseFloat(e.target.value) } : null)}
+                        />
+                      </div>
+                    ) : (
+                      <div>
+                        <div>{airport.latitude}</div>
+                        <div>{airport.longitude}</div>
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex space-x-2">
+                      {editingId === airport.code ? (
+                        <>
+                          <button
+                            onClick={handleSaveEdit}
+                            className="text-green-600 hover:text-green-800"
+                          >
+                            <Save className="h-5 w-5" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              setEditingId(null);
+                              setEditAirport(null);
+                            }}
+                            className="text-gray-600 hover:text-gray-800"
+                          >
+                            <X className="h-5 w-5" />
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => handleEditAirport(airport)}
+                            className="text-blue-600 hover:text-blue-800"
+                          >
+                            <Edit2 className="h-5 w-5" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteAirport(airport.code)}
+                            className="text-red-600 hover:text-red-800"
+                          >
+                            <Trash2 className="h-5 w-5" />
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AdminAirports;

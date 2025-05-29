@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Send, Calendar, DollarSign, MapPin, User, Mail } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { FlightPlanRequest } from '../types';
 
 const VacationCounselor = () => {
   const [formData, setFormData] = useState({
@@ -18,6 +19,20 @@ const VacationCounselor = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const request: FlightPlanRequest = {
+      id: Math.random().toString(36).substr(2, 9),
+      ...formData,
+      status: 'pending',
+      timestamp: new Date().toISOString()
+    };
+
+    // Get existing requests or initialize empty array
+    const existingRequests = JSON.parse(localStorage.getItem('flightPlanRequests') || '[]');
+    
+    // Add new request
+    localStorage.setItem('flightPlanRequests', JSON.stringify([...existingRequests, request]));
+    
     setSubmitted(true);
     toast.success('Thanks for submitting! Our vacation counselor will contact you soon.');
   };

@@ -1,3 +1,33 @@
+export interface Airport {
+  code: string;
+  name: string;
+  city: string;
+  country: string;
+  latitude: number;
+  longitude: number;
+}
+
+export interface Destination {
+  id: string;
+  code: string;
+  city: string;
+  country: string;
+  isActive: boolean;
+}
+
+export interface TripPlan {
+  id: string;
+  userId: string;
+  origin: string;
+  destination: string;
+  departureDate: string;
+  returnDate?: string;
+  numberOfPassengers: number;
+  status: 'planned' | 'booked' | 'cancelled';
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Seat {
   id: string;
   number: string;
@@ -41,10 +71,12 @@ export interface Booking {
 }
 
 export interface SearchParams {
-  type: 'number' | 'route';
-  flightNumber?: string;
-  origin?: string;
-  destination?: string;
+  type: 'route';
+  origin: string;
+  destination: string;
+  departureDate?: string;
+  returnDate?: string;
+  passengers?: number;
 }
 
 export interface NewFlight {
@@ -60,4 +92,18 @@ export interface NewFlight {
   economyPrice: number;
   businessPrice: number;
   firstClassPrice: number;
+}
+
+export interface FlightPlanRequest {
+  id: string;
+  name: string;
+  email: string;
+  destination: string;
+  startDate: string;
+  endDate: string;
+  budget: string;
+  preferences: string[];
+  additionalNotes: string;
+  status: 'pending' | 'contacted' | 'completed';
+  timestamp: string;
 }

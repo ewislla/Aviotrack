@@ -44,45 +44,45 @@ const TravelGuide = () => {
       title: 'Cultural Awareness',
       icon: <Globe2 className="h-6 w-6 text-blue-600" />,
       items: [
-        'Learn key phrases in the local language',
-        'Respect local customs and traditions',
-        'Dress appropriately for the culture',
-        'Be mindful of body language and gestures',
-        'Support local businesses and artisans',
+        'Learn a few basic phrases of the local language',
+        'Understand local customs and etiquette',
+        'Respect religious and cultural practices',
+        'Dress appropriately for the culture and setting',
       ],
-      image: 'https://images.pexels.com/photos/3184436/pexels-photo-3184436.jpeg',
+      image: 'https://images.pexels.com/photos/693744/pexels-photo-693744.jpeg',
     },
   ];
 
   return (
-    <div className="grid gap-8 p-6">
+    <div className="p-4 space-y-6">
       {tips.map((tip, index) => (
-        <div key={index} className="bg-white p-4 shadow rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
+        <div key={index} className="border p-4 rounded-lg shadow-sm">
+          <div className="flex items-center gap-2">
             {tip.icon}
-            <h3 className="text-lg font-bold">{tip.title}</h3>
+            <h2 className="text-xl font-semibold">{tip.title}</h2>
           </div>
+
+          {/* Render items if they exist */}
           {tip.items && (
-            <ul className="list-disc list-inside text-sm text-gray-700">
+            <ul className="list-disc list-inside mt-2">
               {tip.items.map((item, i) => (
                 <li key={i}>{item}</li>
               ))}
             </ul>
           )}
+
+          {/* Render content if it exists */}
           {tip.content && (
-            <ul className="list-disc list-inside text-sm text-gray-700">
-              {Object.entries(tip.content).map(([season, desc]) => (
+            <ul className="list-disc list-inside mt-2">
+              {Object.entries(tip.content).map(([season, description]) => (
                 <li key={season}>
-                  <strong>{season}:</strong> {desc}
+                  <strong>{season}:</strong> {description}
                 </li>
               ))}
             </ul>
           )}
-          <img
-            src={tip.image}
-            alt={tip.title}
-            className="mt-3 w-full h-48 object-cover rounded"
-          />
+
+          <img src={tip.image} alt={tip.title} className="mt-4 w-full h-auto rounded-md" />
         </div>
       ))}
     </div>

@@ -18,6 +18,7 @@ import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminBookingList from './pages/AdminBookingList';
 import AdminNotifications from './pages/AdminNotifications';
+import AdminAirports from './pages/AdminAirports';
 import TravelGuide from './pages/TravelGuide';
 import VacationCounselor from './pages/VacationCounselor';
 
@@ -75,6 +76,11 @@ function App() {
                 <Route path="/admin/notifications" element={
                   <ProtectedRoute>
                     <AdminNotifications />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/airports" element={
+                  <ProtectedRoute>
+                    <AdminAirports />
                   </ProtectedRoute>
                 } />
               </Routes>
