@@ -5,6 +5,8 @@ import { toast } from 'react-hot-toast';
 import { mockFlights, mockBookings, saveBookings, updateSeatStatus } from '../data';
 import { Flight, Booking, Seat } from '../types';
 import { generatePNR } from '../utils/generatePNR';
+import { collection, addDoc } from 'firebase/firestore';
+import { db } from '../firebase'; // adjust the path
 
 const BookingDetails = () => {
   const { flightId } = useParams();
@@ -81,9 +83,17 @@ const BookingDetails = () => {
     updateSeatStatus(flight.id, selectedSeats, 'Booked');
 
     // Add booking to mockBookings and save to localStorage
-    mockBookings.push(booking);
-    saveBookings(mockBookings);
+    const handleBooking = async (booking) => {
+  try {
+    await addDoc(collection(db, 'bookings'), booking); // ✅ Now valid
+    toast.success('Booking confirmed!');
+    navigate(`/confirmation/${booking.id}`, { state: { booking } });
+  } catch (error) {
+    toast.error('Booking failed');
+  }
+};
 
+  
     toast.success('Booking confirmed!');
     navigate(`/confirmation/${booking.id}`, { state: { booking } });
   };
