@@ -2,18 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plane, Search, Plus, Edit2, Save, X, Trash2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { Airport, airports as initialAirports } from '../data/airports';
+import { airports as initialAirports } from '../data/airports';
+import { Airport } from '../types'; // or wherever your types are defined
 
 const AdminAirports = () => {
   const navigate = useNavigate();
   const [airports, setAirports] = useState<Airport[]>(() => {
-    const saved = localStorage.getItem('customAirports');
+    const saved = localStorage.getItem('custaomAirports');
     return saved ? JSON.parse(saved) : initialAirports;
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [newAirport, setNewAirport] = useState<Omit<Airport, 'code'>>({
+    id: '',
     name: '',
     city: '',
     country: '',
@@ -50,6 +52,7 @@ const AdminAirports = () => {
     setAirports([...airports, airport]);
     setShowAddForm(false);
     setNewAirport({
+      id: '',
       name: '',
       city: '',
       country: '',
@@ -236,7 +239,7 @@ const AdminAirports = () => {
                         type="text"
                         className="w-full px-2 py-1 border rounded"
                         value={editAirport?.name}
-                        onChange={(e) => setEditAirport(prev => prev ? { ...prev, name: e.target.value } : null)}
+                       onChange={(e) => setEditAirport((prev: Airport | null) => prev ? { ...prev, name: e.target.value } : null)}
                       />
                     ) : (
                       airport.name
@@ -249,13 +252,13 @@ const AdminAirports = () => {
                           type="text"
                           className="w-full px-2 py-1 border rounded"
                           value={editAirport?.city}
-                          onChange={(e) => setEditAirport(prev => prev ? { ...prev, city: e.target.value } : null)}
+                          onChange={(e) => setEditAirport((prev: Airport | null) => prev ? { ...prev, name: e.target.value } : null)}
                         />
                         <input
                           type="text"
                           className="w-full px-2 py-1 border rounded"
                           value={editAirport?.country}
-                          onChange={(e) => setEditAirport(prev => prev ? { ...prev, country: e.target.value } : null)}
+                          onChange={(e) => setEditAirport((prev: Airport | null) => prev ? { ...prev, name: e.target.value } : null)}
                         />
                       </div>
                     ) : (
@@ -273,14 +276,14 @@ const AdminAirports = () => {
                           step="any"
                           className="w-full px-2 py-1 border rounded"
                           value={editAirport?.latitude}
-                          onChange={(e) => setEditAirport(prev => prev ? { ...prev, latitude: parseFloat(e.target.value) } : null)}
+                          onChange={(e) => setEditAirport((prev: Airport | null) => prev ? { ...prev, name: e.target.value } : null)}
                         />
                         <input
                           type="number"
                           step="any"
                           className="w-full px-2 py-1 border rounded"
                           value={editAirport?.longitude}
-                          onChange={(e) => setEditAirport(prev => prev ? { ...prev, longitude: parseFloat(e.target.value) } : null)}
+                          onChange={(e) => setEditAirport((prev: Airport | null) => prev ? { ...prev, name: e.target.value } : null)}
                         />
                       </div>
                     ) : (

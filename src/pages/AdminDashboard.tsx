@@ -4,8 +4,9 @@ import { Table, Edit2, Save, X, Users, Plane, Plus, DollarSign, MapPin, Mail, Ca
 import Select from 'react-select';
 import { mockFlights, mockBookings, saveFlights } from '../data';
 import { airports } from '../data/airports';
-import { Flight, Booking, NewFlight, FlightPlanRequest } from '../types';
+import {  Airport, Seat, Flight, Booking, NewFlight, FlightPlanRequest } from '../types';
 import { toast } from 'react-hot-toast';
+
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -51,7 +52,7 @@ const AdminDashboard = () => {
     toast.success('Request status updated');
   };
 
-  const airportOptions = airports.map(airport => ({
+  const airportOptions = airports.map((airport: Airport) => ({
     value: airport.code,
     label: `${airport.city} (${airport.code}) - ${airport.name}, ${airport.country}`
   }));
@@ -100,8 +101,8 @@ const AdminDashboard = () => {
         seats.push({
           id: `${row}${col}`,
           number: `${row}${col}`,
-          class: 'First Class',
-          status: 'Available',
+          class: 'First Class' as const,
+          status: 'Available' as const,
           price: firstClassPrice
         });
       }
@@ -113,8 +114,8 @@ const AdminDashboard = () => {
         seats.push({
           id: `${row}${col}`,
           number: `${row}${col}`,
-          class: 'Business',
-          status: 'Available',
+          class: 'Business' as const,
+          status: 'Available' as const,
           price: businessPrice
         });
       }
@@ -126,8 +127,8 @@ const AdminDashboard = () => {
         seats.push({
           id: `${row}${col}`,
           number: `${row}${col}`,
-          class: 'Economy',
-          status: 'Available',
+          class: 'Economy' as const,
+          status: 'Available' as const,
           price: economyPrice
         });
       }

@@ -71,12 +71,10 @@ export interface Booking {
 }
 
 export interface SearchParams {
-  type: 'route';
-  origin: string;
-  destination: string;
-  departureDate?: string;
-  returnDate?: string;
-  passengers?: number;
+  type: 'route' | 'number';
+  origin?: string;
+  destination?: string;
+  flightNumber?: string;
 }
 
 export interface NewFlight {
@@ -106,4 +104,21 @@ export interface FlightPlanRequest {
   additionalNotes: string;
   status: 'pending' | 'contacted' | 'completed';
   timestamp: string;
+}
+
+export interface Airport {
+  id: string;
+  name: string;
+  city: string;
+  country: string;
+  code: string;
+  latitude: number;
+  longitude: number;
+}
+
+export interface SearchParams {
+  type: 'route' | 'number';
+  origin?: string;
+  destination?: string;
+  flightNumber?: string; // Add this missing property
 }

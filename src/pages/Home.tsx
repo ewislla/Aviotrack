@@ -12,7 +12,7 @@ const Home = () => {
   const navigate = useNavigate();
   const [searchType, setSearchType] = useState<'number' | 'route'>('number');
   const [searchParams, setSearchParams] = useState<SearchParams>({
-    type: 'number',
+    type: 'number' as const,
     flightNumber: '',
     origin: '',
     destination: ''
@@ -177,7 +177,7 @@ const Home = () => {
               } rounded-l-lg flex items-center justify-center space-x-2`}
               onClick={() => {
                 setSearchType('number');
-                setSearchParams({ type: 'number', flightNumber: '' });
+              setSearchParams({ type: 'number' as const, flightNumber: '' });
               }}
             >
               <Plane className="h-5 w-5" />

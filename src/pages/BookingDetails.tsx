@@ -83,7 +83,7 @@ const BookingDetails = () => {
     updateSeatStatus(flight.id, selectedSeats, 'Booked');
 
     // Add booking to mockBookings and save to localStorage
-    const handleBooking = async (booking) => {
+    const handleBooking = async (booking: Booking) => {
   try {
     await addDoc(collection(db, 'bookings'), booking); // ✅ Now valid
     toast.success('Booking confirmed!');
