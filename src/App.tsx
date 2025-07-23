@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
+import './i18n'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { ThemeProvider } from './contexts/ThemeContext';
-import { LanguageProvider } from './contexts/LanguageContext';
+
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Chatbot from './components/Chatbot';
@@ -46,7 +47,7 @@ function App() {
 
   return (
     <ThemeProvider>
-      <LanguageProvider>
+      
         <BrowserRouter>
           <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
             <Navbar />
@@ -90,7 +91,7 @@ function App() {
             <Toaster position="top-right" />
           </div>
         </BrowserRouter>
-      </LanguageProvider>
+     
     </ThemeProvider>
   );
 }

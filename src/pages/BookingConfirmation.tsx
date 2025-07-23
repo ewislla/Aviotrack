@@ -6,22 +6,39 @@ import QRCode from 'qrcode';
 import { Booking } from '../types';
 import { generateTicket } from '../utils/generatePDF';
 import { sendConfirmationEmail } from '../utils/sendEmail';
+import { addBooking } from '../services/firebaseService';
 
 const BookingConfirmation = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [booking, setBooking] = useState<Booking | null>(null);
-  const [qrCode, setQrCode] = useState<string>('');
+  const [booking, setBooking] = useState(null);
+  const [qrCode, setQrCode] = useState('');
 
   useEffect(() => {
     if (!location.state?.booking) {
       navigate('/book');
       return;
     }
-    setBooking(location.state.booking);
-    generateQRCode(location.state.booking.pnr);
+    
+    const bookingData = location.state.booking;
+    setBooking(bookingData);
+    generateQRCode(bookingData.pnr);
+    
+    // Save booking to Firebase
+    saveBookingToFirebase(bookingData);
   }, [location.state, navigate]);
 
+  const saveBookingToFirebase = async (bookingData) => {
+    try {
+      await addBooking(bookingData);
+      console.log('Booking saved to Firebase');
+    } catch (error) {
+      console.error('Error saving booking to Firebase:', error);
+      // Don't show error to user as this is a background operation
+    }
+  };
+
+  
   const generateQRCode = async (pnr: string) => {
     try {
       const qrCodeDataUrl = await QRCode.toDataURL(pnr);

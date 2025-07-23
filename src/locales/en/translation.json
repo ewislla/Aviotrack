@@ -1,0 +1,14 @@
+{
+  "navbar": {
+    "tagline": "Your Flight Companion",
+    "home": "Home",
+    "flightStatus": "Flight Status",
+    "book": "Book",
+    "schedule": "Schedule",
+    "guide": "Travel Guide",
+    "plan": "Plan Trip",
+    "contact": "Contact",
+    "ctaBanner": "Plan your perfect vacation !",
+    "getStarted": "Get Started"
+  }
+}

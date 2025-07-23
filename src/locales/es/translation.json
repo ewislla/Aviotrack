@@ -1,0 +1,14 @@
+{
+  "navbar": {
+    "tagline": "Tu Compañero de Vuelo",
+    "home": "Inicio",
+    "flightStatus": "Estado del Vuelo",
+    "book": "Reservar",
+    "schedule": "Horario",
+    "guide": "Guía de Viaje",
+    "plan": "Planificar Viaje",
+    "contact": "Contacto",
+    "ctaBanner": "¡Planifica tus vacaciones perfectas con asistencia AI!",
+    "getStarted": "Comenzar"
+  }
+}

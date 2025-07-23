@@ -1,0 +1,14 @@
+{
+  "navbar": {
+    "tagline": "Votre Compagnon de Vol",
+    "home": "Accueil",
+    "flightStatus": "Statut du Vol",
+    "book": "Réserver",
+    "schedule": "Horaire",
+    "guide": "Guide de Voyage",
+    "plan": "Planifier le Voyage",
+    "contact": "Contact",
+    "ctaBanner": "Planifiez vos vacances parfaites avec l'assistance IA!",
+    "getStarted": "Commencer"
+  }
+}

@@ -1,0 +1,526 @@
+src/components/LanguageToggle.tsx:17:33 - error TS7006: Parameter 'languageCode' implicitly has an 'any' type.
+
+17   const handleLanguageChange = (languageCode) => {
+                                   ~~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:66:18 - error TS2345: Argument of type '{ id: string; }[]' is not assignable to parameter of type 'SetStateAction<never[]>'.
+  Type '{ id: string; }[]' is not assignable to type 'never[]'.
+    Type '{ id: string; }' is not assignable to type 'never'.
+
+66       setFlights(flightsData);
+                    ~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:67:19 - error TS2345: Argument of type '{ id: string; }[]' is not assignable to parameter of type 'SetStateAction<never[]>'.
+  Type '{ id: string; }[]' is not assignable to type 'never[]'.
+    Type '{ id: string; }' is not assignable to type 'never'.
+
+67       setBookings(bookingsData);
+                     ~~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:68:19 - error TS2345: Argument of type '{ id: string; }[]' is not assignable to parameter of type 'SetStateAction<never[]>'.
+  Type '{ id: string; }[]' is not assignable to type 'never[]'.
+    Type '{ id: string; }' is not assignable to type 'never'.
+
+68       setAirports(airportsData);
+                     ~~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:69:29 - error TS2345: Argument of type '{ id: string; }[]' is not assignable to parameter of type 'SetStateAction<never[]>'.
+  Type '{ id: string; }[]' is not assignable to type 'never[]'.
+    Type '{ id: string; }' is not assignable to type 'never'.
+
+69       setFlightPlanRequests(requestsData);
+                               ~~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:78:26 - error TS7006: Parameter 'economyPrice' implicitly has an 'any' type.
+
+78   const generateSeats = (economyPrice, businessPrice, firstClassPrice) => {
+                            ~~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:78:40 - error TS7006: Parameter 'businessPrice' implicitly has an 'any' type.
+
+78   const generateSeats = (economyPrice, businessPrice, firstClassPrice) => {
+                                          ~~~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:78:55 - error TS7006: Parameter 'firstClassPrice' implicitly has an 'any' type.
+
+78   const generateSeats = (economyPrice, businessPrice, firstClassPrice) => {
+                                                         ~~~~~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:170:45 - error TS2339: Property 'id' does not exist on type 'never'.
+
+170         await updateFlight(editedFlightData.id, editedFlightData);
+                                                ~~
+
+src/pages/AdminDashboard.tsx:182:38 - error TS7006: Parameter 'requestId' implicitly has an 'any' type.
+
+182   const updateRequestStatus = async (requestId, newStatus) => {
+                                         ~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:182:49 - error TS7006: Parameter 'newStatus' implicitly has an 'any' type.
+
+182   const updateRequestStatus = async (requestId, newStatus) => {
+                                                    ~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:195:35 - error TS2304: Cannot find name 'Flight'.
+
+195   const openPriceModal = (flight: Flight) => {
+                                      ~~~~~~
+
+src/pages/AdminDashboard.tsx:196:5 - error TS2304: Cannot find name 'setSelectedFlight'.
+
+196     setSelectedFlight(flight);
+        ~~~~~~~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:197:5 - error TS2304: Cannot find name 'setPrices'.
+
+197     setPrices({
+        ~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:202:5 - error TS2304: Cannot find name 'setShowPriceModal'.
+
+202     setShowPriceModal(true);
+        ~~~~~~~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:206:9 - error TS2304: Cannot find name 'selectedFlight'.
+
+206     if (selectedFlight) {
+            ~~~~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:207:27 - error TS2304: Cannot find name 'mockFlights'.
+
+207       const flightIndex = mockFlights.findIndex(f => f.id === selectedFlight.id);
+                              ~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:207:49 - error TS7006: Parameter 'f' implicitly has an 'any' type.
+
+207       const flightIndex = mockFlights.findIndex(f => f.id === selectedFlight.id);
+                                                    ~
+
+src/pages/AdminDashboard.tsx:207:63 - error TS2304: Cannot find name 'selectedFlight'.
+
+207       const flightIndex = mockFlights.findIndex(f => f.id === selectedFlight.id);
+                                                                  ~~~~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:209:9 - error TS2304: Cannot find name 'mockFlights'.
+
+209         mockFlights[flightIndex] = {
+            ~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:210:14 - error TS2304: Cannot find name 'mockFlights'.
+
+210           ...mockFlights[flightIndex],
+                 ~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:211:25 - error TS2304: Cannot find name 'prices'.
+
+211           economyPrice: prices.economy,
+                            ~~~~~~
+
+src/pages/AdminDashboard.tsx:212:26 - error TS2304: Cannot find name 'prices'.
+
+212           businessPrice: prices.business,
+                             ~~~~~~
+
+src/pages/AdminDashboard.tsx:213:28 - error TS2304: Cannot find name 'prices'.
+
+213           firstClassPrice: prices.firstClass
+                               ~~~~~~
+
+src/pages/AdminDashboard.tsx:215:9 - error TS2552: Cannot find name 'saveFlights'. Did you mean 'setFlights'?
+
+215         saveFlights(mockFlights);
+            ~~~~~~~~~~~
+
+  src/pages/AdminDashboard.tsx:24:19
+    24   const [flights, setFlights] = useState([]);
+                         ~~~~~~~~~~
+    'setFlights' is declared here.
+
+src/pages/AdminDashboard.tsx:215:21 - error TS2304: Cannot find name 'mockFlights'.
+
+215         saveFlights(mockFlights);
+                        ~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:219:5 - error TS2304: Cannot find name 'setShowPriceModal'.
+
+219     setShowPriceModal(false);
+        ~~~~~~~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:222:35 - error TS2304: Cannot find name 'FlightPlanRequest'.
+
+222   const getStatusColor = (status: FlightPlanRequest['status']) => {
+                                      ~~~~~~~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:248:22 - error TS2304: Cannot find name 'handleLogout'.
+
+248             onClick={handleLogout}
+                         ~~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:333:30 - error TS2304: Cannot find name 'airportOptions'.
+
+333                     options={airportOptions}
+                                 ~~~~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:334:28 - error TS2304: Cannot find name 'airportOptions'.
+
+334                     value={airportOptions.find(option => option.value === newFlight.origin)}
+                               ~~~~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:334:48 - error TS7006: Parameter 'option' implicitly has an 'any' type.
+
+334                     value={airportOptions.find(option => option.value === newFlight.origin)}
+                                                   ~~~~~~
+
+src/pages/AdminDashboard.tsx:343:30 - error TS2304: Cannot find name 'airportOptions'.
+
+343                     options={airportOptions}
+                                 ~~~~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:344:28 - error TS2304: Cannot find name 'airportOptions'.
+
+344                     value={airportOptions.find(option => option.value === newFlight.destination)}
+                               ~~~~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:344:48 - error TS7006: Parameter 'option' implicitly has an 'any' type.
+
+344                     value={airportOptions.find(option => option.value === newFlight.destination)}
+                                                   ~~~~~~
+
+src/pages/AdminDashboard.tsx:441:12 - error TS2304: Cannot find name 'showPriceModal'.
+
+441           {showPriceModal && selectedFlight && (
+               ~~~~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:441:30 - error TS2304: Cannot find name 'selectedFlight'.
+
+441           {showPriceModal && selectedFlight && (
+                                 ~~~~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:452:32 - error TS2304: Cannot find name 'prices'.
+
+452                         value={prices.economy}
+                                   ~~~~~~
+
+src/pages/AdminDashboard.tsx:453:42 - error TS2304: Cannot find name 'setPrices'.
+
+453                         onChange={(e) => setPrices({ ...prices, economy: parseInt(e.target.value) })}
+                                             ~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:453:57 - error TS2304: Cannot find name 'prices'.
+
+453                         onChange={(e) => setPrices({ ...prices, economy: parseInt(e.target.value) })}
+                                                            ~~~~~~
+
+src/pages/AdminDashboard.tsx:464:32 - error TS2304: Cannot find name 'prices'.
+
+464                         value={prices.business}
+                                   ~~~~~~
+
+src/pages/AdminDashboard.tsx:465:42 - error TS2304: Cannot find name 'setPrices'.
+
+465                         onChange={(e) => setPrices({ ...prices, business: parseInt(e.target.value) })}
+                                             ~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:465:57 - error TS2304: Cannot find name 'prices'.
+
+465                         onChange={(e) => setPrices({ ...prices, business: parseInt(e.target.value) })}
+                                                            ~~~~~~
+
+src/pages/AdminDashboard.tsx:476:32 - error TS2304: Cannot find name 'prices'.
+
+476                         value={prices.firstClass}
+                                   ~~~~~~
+
+src/pages/AdminDashboard.tsx:477:42 - error TS2304: Cannot find name 'setPrices'.
+
+477                         onChange={(e) => setPrices({ ...prices, firstClass: parseInt(e.target.value) })}
+                                             ~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:477:57 - error TS2304: Cannot find name 'prices'.
+
+477                         onChange={(e) => setPrices({ ...prices, firstClass: parseInt(e.target.value) })}
+                                                            ~~~~~~
+
+src/pages/AdminDashboard.tsx:485:36 - error TS2304: Cannot find name 'setShowPriceModal'.
+
+485                     onClick={() => setShowPriceModal(false)}
+                                       ~~~~~~~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:524:20 - error TS2304: Cannot find name 'mockFlights'.
+
+524                   {mockFlights.map((flight) => (
+                       ~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:524:37 - error TS7006: Parameter 'flight' implicitly has an 'any' type.
+
+524                   {mockFlights.map((flight) => (
+                                        ~~~~~~
+
+src/pages/AdminDashboard.tsx:531:54 - error TS2339: Property 'flightNumber' does not exist on type 'never'.
+
+531                             value={editedFlightData?.flightNumber}
+                                                         ~~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:534:33 - error TS2698: Spread types may only be created from object types.
+
+534                                 ...prev,
+                                    ~~~~~~~
+
+src/pages/AdminDashboard.tsx:550:54 - error TS2339: Property 'status' does not exist on type 'never'.
+
+550                             value={editedFlightData?.status}
+                                                         ~~~~~~
+
+src/pages/AdminDashboard.tsx:553:33 - error TS2698: Spread types may only be created from object types.
+
+553                                 ...prev,
+                                    ~~~~~~~
+
+src/pages/AdminDashboard.tsx:554:59 - error TS2304: Cannot find name 'Flight'.
+
+554                                 status: e.target.value as Flight['status']
+                                                              ~~~~~~
+
+src/pages/AdminDashboard.tsx:593:40 - error TS2304: Cannot find name 'handleCancelEdit'.
+
+593                               onClick={handleCancelEdit}
+                                           ~~~~~~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:601:44 - error TS2304: Cannot find name 'handleEditFlight'.
+
+601                             onClick={() => handleEditFlight(flight)}
+                                               ~~~~~~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:636:20 - error TS2304: Cannot find name 'mockBookings'.
+
+636                   {mockBookings.map((booking) => (
+                       ~~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:636:38 - error TS7006: Parameter 'booking' implicitly has an 'any' type.
+
+636                   {mockBookings.map((booking) => (
+                                         ~~~~~~~
+
+src/pages/AdminDashboard.tsx:688:38 - error TS2339: Property 'id' does not exist on type 'never'.
+
+688                     <tr key={request.id}>
+                                         ~~
+
+src/pages/AdminDashboard.tsx:690:34 - error TS2339: Property 'name' does not exist on type 'never'.
+
+690                         {request.name}
+                                     ~~~~
+
+src/pages/AdminDashboard.tsx:695:42 - error TS2339: Property 'email' does not exist on type 'never'.
+
+695                           <span>{request.email}</span>
+                                             ~~~~~
+
+src/pages/AdminDashboard.tsx:699:34 - error TS2339: Property 'destination' does not exist on type 'never'.
+
+699                         {request.destination}
+                                     ~~~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:703:89 - error TS2339: Property 'startDate' does not exist on type 'never'.
+
+703                           <p className="text-sm text-gray-600">Start: {new Date(request.startDate).toLocaleDateString()}</p>
+                                                                                            ~~~~~~~~~
+
+src/pages/AdminDashboard.tsx:704:87 - error TS2339: Property 'endDate' does not exist on type 'never'.
+
+704                           <p className="text-sm text-gray-600">End: {new Date(request.endDate).toLocaleDateString()}</p>
+                                                                                          ~~~~~~~
+
+src/pages/AdminDashboard.tsx:708:34 - error TS2339: Property 'budget' does not exist on type 'never'.
+
+708                         {request.budget}
+                                     ~~~~~~
+
+src/pages/AdminDashboard.tsx:711:99 - error TS2339: Property 'status' does not exist on type 'never'.
+
+711                         <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(request.status)}`}>
+                                                                                                      ~~~~~~
+
+src/pages/AdminDashboard.tsx:712:36 - error TS2339: Property 'status' does not exist on type 'never'.
+
+712                           {request.status}
+                                       ~~~~~~
+
+src/pages/AdminDashboard.tsx:717:36 - error TS2339: Property 'status' does not exist on type 'never'.
+
+717                           {request.status === 'pending' && (
+                                       ~~~~~~
+
+src/pages/AdminDashboard.tsx:719:74 - error TS2339: Property 'id' does not exist on type 'never'.
+
+719                               onClick={() => updateRequestStatus(request.id, 'contacted')}
+                                                                             ~~
+
+src/pages/AdminDashboard.tsx:726:36 - error TS2339: Property 'status' does not exist on type 'never'.
+
+726                           {request.status === 'contacted' && (
+                                       ~~~~~~
+
+src/pages/AdminDashboard.tsx:728:74 - error TS2339: Property 'id' does not exist on type 'never'.
+
+728                               onClick={() => updateRequestStatus(request.id, 'completed')}
+                                                                             ~~
+
+src/pages/BookingConfirmation.tsx:31:40 - error TS7006: Parameter 'bookingData' implicitly has an 'any' type.
+
+31   const saveBookingToFirebase = async (bookingData) => {
+                                          ~~~~~~~~~~~
+
+src/pages/BookingConfirmation.tsx:75:63 - error TS2339: Property 'email' does not exist on type 'never'.
+
+75           toast.success(`Confirmation email sent to ${booking.email}`);
+                                                                 ~~~~~
+
+src/pages/BookingConfirmation.tsx:104:64 - error TS2339: Property 'pnr' does not exist on type 'never'.
+
+104             <span className="text-blue-600 font-mono">{booking.pnr}</span>
+                                                                   ~~~
+
+src/pages/BookingConfirmation.tsx:111:55 - error TS2339: Property 'flight' does not exist on type 'never'.
+
+111                 <p className="font-semibold">{booking.flight.origin}</p>
+                                                          ~~~~~~
+
+src/pages/BookingConfirmation.tsx:113:37 - error TS2339: Property 'flight' does not exist on type 'never'.
+
+113                   {new Date(booking.flight.scheduledDeparture).toLocaleString()}
+                                        ~~~~~~
+
+src/pages/BookingConfirmation.tsx:118:55 - error TS2339: Property 'flight' does not exist on type 'never'.
+
+118                 <p className="font-semibold">{booking.flight.destination}</p>
+                                                          ~~~~~~
+
+src/pages/BookingConfirmation.tsx:120:37 - error TS2339: Property 'flight' does not exist on type 'never'.
+
+120                   {new Date(booking.flight.scheduledArrival).toLocaleString()}
+                                        ~~~~~~
+
+src/pages/BookingConfirmation.tsx:127:72 - error TS2339: Property 'fullName' does not exist on type 'never'.
+
+127               <p><span className="text-gray-600">Name:</span> {booking.fullName}</p>
+                                                                           ~~~~~~~~
+
+src/pages/BookingConfirmation.tsx:128:73 - error TS2339: Property 'email' does not exist on type 'never'.
+
+128               <p><span className="text-gray-600">Email:</span> {booking.email}</p>
+                                                                            ~~~~~
+
+src/pages/BookingConfirmation.tsx:129:73 - error TS2339: Property 'seatClass' does not exist on type 'never'.
+
+129               <p><span className="text-gray-600">Class:</span> {booking.seatClass}</p>
+                                                                            ~~~~~~~~~
+
+src/pages/BookingConfirmation.tsx:130:80 - error TS2339: Property 'seatNumbers' does not exist on type 'never'.
+
+130               <p><span className="text-gray-600">Seat Numbers:</span> {booking.seatNumbers.join(', ')}</p>
+                                                                                   ~~~~~~~~~~~
+
+src/pages/BookingConfirmation.tsx:131:78 - error TS2339: Property 'passengers' does not exist on type 'never'.
+
+131               <p><span className="text-gray-600">Passengers:</span> {booking.passengers}</p>
+                                                                                 ~~~~~~~~~~
+
+src/pages/BookingConfirmation.tsx:136:75 - error TS2339: Property 'flight' does not exist on type 'never'.
+
+136               <p><span className="text-gray-600">Airline:</span> {booking.flight.airline}</p>
+                                                                              ~~~~~~
+
+src/pages/BookingConfirmation.tsx:137:74 - error TS2339: Property 'flight' does not exist on type 'never'.
+
+137               <p><span className="text-gray-600">Flight:</span> {booking.flight.flightNumber}</p>
+                                                                             ~~~~~~
+
+src/pages/BookingConfirmation.tsx:138:76 - error TS2339: Property 'flight' does not exist on type 'never'.
+
+138               <p><span className="text-gray-600">Aircraft:</span> {booking.flight.aircraftType}</p>
+                                                                               ~~~~~~
+
+src/pages/BookingConfirmation.tsx:139:76 - error TS2339: Property 'flight' does not exist on type 'never'.
+
+139               <p><span className="text-gray-600">Terminal:</span> {booking.flight.terminal}</p>
+                                                                               ~~~~~~
+
+src/pages/BookingConfirmation.tsx:140:72 - error TS2339: Property 'flight' does not exist on type 'never'.
+
+140               <p><span className="text-gray-600">Gate:</span> {booking.flight.gate}</p>
+                                                                           ~~~~~~
+
+src/pages/BookingConfirmation.tsx:146:63 - error TS2339: Property 'price' does not exist on type 'never'.
+
+146                 <span className="text-xl font-bold">${booking.price}</span>
+                                                                  ~~~~~
+
+src/services/firebaseService.ts:30:33 - error TS7006: Parameter 'flightData' implicitly has an 'any' type.
+
+30 export const addFlight = async (flightData) => {
+                                   ~~~~~~~~~~
+
+src/services/firebaseService.ts:44:36 - error TS7006: Parameter 'flightId' implicitly has an 'any' type.
+
+44 export const updateFlight = async (flightId, updates) => {
+                                      ~~~~~~~~
+
+src/services/firebaseService.ts:44:46 - error TS7006: Parameter 'updates' implicitly has an 'any' type.
+
+44 export const updateFlight = async (flightId, updates) => {
+                                                ~~~~~~~
+
+src/services/firebaseService.ts:57:36 - error TS7006: Parameter 'flightId' implicitly has an 'any' type.
+
+57 export const deleteFlight = async (flightId) => {
+                                      ~~~~~~~~
+
+src/services/firebaseService.ts:82:34 - error TS7006: Parameter 'bookingData' implicitly has an 'any' type.
+
+82 export const addBooking = async (bookingData) => {
+                                    ~~~~~~~~~~~
+
+src/services/firebaseService.ts:111:34 - error TS7006: Parameter 'airportData' implicitly has an 'any' type.
+
+111 export const addAirport = async (airportData) => {
+                                     ~~~~~~~~~~~
+
+src/services/firebaseService.ts:122:37 - error TS7006: Parameter 'airportId' implicitly has an 'any' type.
+
+122 export const updateAirport = async (airportId, updates) => {
+                                        ~~~~~~~~~
+
+src/services/firebaseService.ts:122:48 - error TS7006: Parameter 'updates' implicitly has an 'any' type.
+
+122 export const updateAirport = async (airportId, updates) => {
+                                                   ~~~~~~~
+
+src/services/firebaseService.ts:132:37 - error TS7006: Parameter 'airportId' implicitly has an 'any' type.
+
+132 export const deleteAirport = async (airportId) => {
+                                        ~~~~~~~~~
+
+src/services/firebaseService.ts:157:44 - error TS7006: Parameter 'requestData' implicitly has an 'any' type.
+
+157 export const addFlightPlanRequest = async (requestData) => {
+                                               ~~~~~~~~~~~
+
+src/services/firebaseService.ts:172:47 - error TS7006: Parameter 'requestId' implicitly has an 'any' type.
+
+172 export const updateFlightPlanRequest = async (requestId, updates) => {
+                                                  ~~~~~~~~~
+
+src/services/firebaseService.ts:172:58 - error TS7006: Parameter 'updates' implicitly has an 'any' type.
+
+172 export const updateFlightPlanRequest = async (requestId, updates) => {
+                                                             ~~~~~~~
+
+
+Found 101 errors in 4 files.
+
+Errors  Files
+     1  src/components/LanguageToggle.tsx:17
+    70  src/pages/AdminDashboard.tsx:66
+    18  src/pages/BookingConfirmation.tsx:31
+    12  src/services/firebaseService.ts:30

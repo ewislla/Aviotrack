@@ -2,26 +2,30 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Table, Edit2, Save, X, Users, Plane, Plus, DollarSign, MapPin, Mail, Calendar, Check } from 'lucide-react';
 import Select from 'react-select';
-import { mockFlights, mockBookings, saveFlights } from '../data';
-import { airports } from '../data/airports';
-import {  Airport, Seat, Flight, Booking, NewFlight, FlightPlanRequest } from '../types';
 import { toast } from 'react-hot-toast';
-
+import { Flight, Booking, Airport, FlightPlanRequest } from '../types';
+import {
+  getAllFlights,
+  addFlight,
+  updateFlight,
+  getAllBookings,
+  getAllAirports,
+  getAllFlightPlanRequests,
+  updateFlightPlanRequest
+} from '../services/firebaseService';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'flights' | 'bookings' | 'requests'>('flights');
-  const [editingFlight, setEditingFlight] = useState<string | null>(null);
-  const [editedFlightData, setEditedFlightData] = useState<Flight | null>(null);
+  const [activeTab, setActiveTab] = useState('flights');
+  const [flights, setFlights] = useState([]);
+  const [bookings, setBookings] = useState([]);
+  const [airports, setAirports] = useState([]);
+  const [flightPlanRequests, setFlightPlanRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [editingFlight, setEditingFlight] = useState(null);
+  const [editedFlightData, setEditedFlightData] = useState(null);
   const [showAddFlight, setShowAddFlight] = useState(false);
-  const [showPriceModal, setShowPriceModal] = useState(false);
-  const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
-  const [prices, setPrices] = useState({
-    economy: 0,
-    business: 0,
-    firstClass: 0
-  });
-  const [newFlight, setNewFlight] = useState<NewFlight>({
+  const [newFlight, setNewFlight] = useState({
     airline: '',
     flightNumber: '',
     origin: '',
@@ -36,60 +40,35 @@ const AdminDashboard = () => {
     firstClassPrice: 0
   });
 
-  const [flightPlanRequests, setFlightPlanRequests] = useState<FlightPlanRequest[]>([]);
-
-  useEffect(() => {
-    const requests = JSON.parse(localStorage.getItem('flightPlanRequests') || '[]');
-    setFlightPlanRequests(requests);
-  }, []);
-
-  const updateRequestStatus = (requestId: string, newStatus: FlightPlanRequest['status']) => {
-    const updatedRequests = flightPlanRequests.map(request => 
-      request.id === requestId ? { ...request, status: newStatus } : request
-    );
-    setFlightPlanRequests(updatedRequests);
-    localStorage.setItem('flightPlanRequests', JSON.stringify(updatedRequests));
-    toast.success('Request status updated');
-  };
-
-  const airportOptions = airports.map((airport: Airport) => ({
-    value: airport.code,
-    label: `${airport.city} (${airport.code}) - ${airport.name}, ${airport.country}`
-  }));
-
   useEffect(() => {
     const isLoggedIn = localStorage.getItem('isAdminLoggedIn');
     if (!isLoggedIn) {
       navigate('/admin/login');
+      return;
     }
+    loadData();
   }, [navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('isAdminLoggedIn');
-    navigate('/admin/login');
-  };
-
-  const handleEditFlight = (flight: Flight) => {
-    setEditingFlight(flight.id);
-    setEditedFlightData(flight);
-  };
-
-  const handleSaveEdit = () => {
-    if (editedFlightData) {
-      const flightIndex = mockFlights.findIndex(f => f.id === editedFlightData.id);
-      if (flightIndex !== -1) {
-        mockFlights[flightIndex] = editedFlightData;
-        saveFlights(mockFlights);
-        toast.success('Flight updated successfully');
-      }
-      setEditingFlight(null);
-      setEditedFlightData(null);
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const [flightsData, bookingsData, airportsData, requestsData] = await Promise.all([
+        getAllFlights(),
+        getAllBookings(),
+        getAllAirports(),
+        getAllFlightPlanRequests()
+      ]);
+      
+const [flights, setFlights] = useState<Flight[]>([]);
+const [bookings, setBookings] = useState<Booking[]>([]);
+const [airports, setAirports] = useState<Airport[]>([]);
+const [flightPlanRequests, setFlightPlanRequests] = useState<FlightPlanRequest[]>([]);
+    } catch (error) {
+      console.error('Error loading data:', error);
+      toast.error('Error loading data');
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const handleCancelEdit = () => {
-    setEditingFlight(null);
-    setEditedFlightData(null);
   };
 
   const generateSeats = (economyPrice: number, businessPrice: number, firstClassPrice: number) => {
@@ -101,8 +80,8 @@ const AdminDashboard = () => {
         seats.push({
           id: `${row}${col}`,
           number: `${row}${col}`,
-          class: 'First Class' as const,
-          status: 'Available' as const,
+          class: 'First Class',
+          status: 'Available',
           price: firstClassPrice
         });
       }
@@ -114,8 +93,8 @@ const AdminDashboard = () => {
         seats.push({
           id: `${row}${col}`,
           number: `${row}${col}`,
-          class: 'Business' as const,
-          status: 'Available' as const,
+          class: 'Business',
+          status: 'Available',
           price: businessPrice
         });
       }
@@ -127,8 +106,8 @@ const AdminDashboard = () => {
         seats.push({
           id: `${row}${col}`,
           number: `${row}${col}`,
-          class: 'Economy' as const,
-          status: 'Available' as const,
+          class: 'Economy',
+          status: 'Available',
           price: economyPrice
         });
       }
@@ -137,7 +116,7 @@ const AdminDashboard = () => {
     return seats;
   };
 
-  const handleAddFlight = () => {
+  const handleAddFlight = async () => {
     if (!newFlight.origin || !newFlight.destination) {
       toast.error('Please select both origin and destination airports');
       return;
@@ -148,34 +127,66 @@ const AdminDashboard = () => {
       return;
     }
 
-    const flight: Flight = {
-      id: Math.random().toString(36).substr(2, 9),
-      ...newFlight,
-      actualDeparture: '',
-      actualArrival: '',
-      status: 'On Time',
-      seats: generateSeats(newFlight.economyPrice, newFlight.businessPrice, newFlight.firstClassPrice)
-    };
+    try {
+      const flightData = {
+        ...newFlight,
+        actualDeparture: '',
+        actualArrival: '',
+        status: 'On Time',
+        seats: generateSeats(newFlight.economyPrice, newFlight.businessPrice, newFlight.firstClassPrice)
+      };
 
-    mockFlights.push(flight);
-    saveFlights(mockFlights);
-    setShowAddFlight(false);
-    setNewFlight({
-      airline: '',
-      flightNumber: '',
-      origin: '',
-      destination: '',
-      scheduledDeparture: '',
-      scheduledArrival: '',
-      terminal: '',
-      gate: '',
-      aircraftType: '',
-      economyPrice: 0,
-      businessPrice: 0,
-      firstClassPrice: 0
-    });
-    toast.success('Flight added successfully');
+      await addFlight(flightData);
+      await loadData(); // Refresh data
+      setShowAddFlight(false);
+      setNewFlight({
+        airline: '',
+        flightNumber: '',
+        origin: '',
+        destination: '',
+        scheduledDeparture: '',
+        scheduledArrival: '',
+        terminal: '',
+        gate: '',
+        aircraftType: '',
+        economyPrice: 0,
+        businessPrice: 0,
+        firstClassPrice: 0
+      });
+      toast.success('Flight added successfully');
+    } catch (error) {
+      console.error('Error adding flight:', error);
+      toast.error('Error adding flight');
+    }
   };
+
+  const handleSaveEdit = async () => {
+    if (editedFlightData) {
+      try {
+        await updateFlight(editedFlightData.id, editedFlightData);
+        await loadData(); // Refresh data
+        setEditingFlight(null);
+        setEditedFlightData(null);
+        toast.success('Flight updated successfully');
+      } catch (error) {
+        console.error('Error updating flight:', error);
+        toast.error('Error updating flight');
+      }
+    }
+  };
+
+  const updateRequestStatus = async (requestId, newStatus) => {
+    try {
+      await updateFlightPlanRequest(requestId, { status: newStatus });
+      await loadData(); // Refresh data
+      toast.success('Request status updated');
+    } catch (error) {
+      console.error('Error updating request status:', error);
+      toast.error('Error updating request status');
+    }
+  };
+
+  
 
   const openPriceModal = (flight: Flight) => {
     setSelectedFlight(flight);
@@ -215,6 +226,15 @@ const AdminDashboard = () => {
       default:
         return 'bg-gray-100 text-gray-800';
     }
+  };
+  
+const AdminDashboard = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Example logout logic
+    localStorage.removeItem('user'); // Or whatever key you use
+    navigate('/login');
   };
 
   return (
@@ -730,5 +750,4 @@ const AdminDashboard = () => {
     </div>
   );
 };
-
 export default AdminDashboard;

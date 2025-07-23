@@ -8,6 +8,7 @@ import { generatePNR } from '../utils/generatePNR';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../firebase'; // adjust the path
 
+
 const BookingDetails = () => {
   const { flightId } = useParams();
   const navigate = useNavigate();
@@ -56,47 +57,47 @@ const BookingDetails = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!flight) return;
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!flight) return;
 
-    if (selectedSeats.length !== formData.passengers) {
-      toast.error(`Please select ${formData.passengers} seats`);
-      return;
-    }
+  if (selectedSeats.length !== formData.passengers) {
+    toast.error(`Please select ${formData.passengers} seats`);
+    return;
+  }
 
-    const booking: Booking = {
-      id: Math.random().toString(36).substr(2, 9),
-      pnr: generatePNR(),
-      fullName: formData.fullName,
-      email: formData.email,
-      flightNumber: flight.flightNumber,
-      passengers: formData.passengers,
-      timestamp: new Date().toISOString(),
-      seatClass: formData.seatClass,
-      seatNumbers: selectedSeats,
-      price: calculatePrice(),
-      flight: flight
-    };
+  const booking: Booking = {
+    id: Math.random().toString(36).substr(2, 9),
+    pnr: generatePNR(),
+    fullName: formData.fullName,
+    email: formData.email,
+    flightNumber: flight.flightNumber,
+    passengers: formData.passengers,
+    timestamp: new Date().toISOString(),
+    seatClass: formData.seatClass,
+    seatNumbers: selectedSeats,
+    price: calculatePrice(),
+    flight: flight
+  };
 
+  try {
+    // Save to Firebase
+    await addDoc(collection(db, 'bookings'), booking);
+    
     // Update seat status
     updateSeatStatus(flight.id, selectedSeats, 'Booked');
-
-    // Add booking to mockBookings and save to localStorage
-    const handleBooking = async (booking: Booking) => {
-  try {
-    await addDoc(collection(db, 'bookings'), booking); // ✅ Now valid
+    
+    // Also save to localStorage for offline functionality
+    mockBookings.push(booking);
+    saveBookings(mockBookings);
+    
     toast.success('Booking confirmed!');
     navigate(`/confirmation/${booking.id}`, { state: { booking } });
   } catch (error) {
-    toast.error('Booking failed');
+    console.error('Error saving booking:', error);
+    toast.error('Booking failed. Please try again.');
   }
 };
-
-  
-    toast.success('Booking confirmed!');
-    navigate(`/confirmation/${booking.id}`, { state: { booking } });
-  };
 
   const renderSeatMap = () => {
     if (!flight) return null;
