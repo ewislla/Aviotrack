@@ -1,29 +1,15 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plane, Search, Plus, Edit2, Save, X, Trash2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { Airport } from '../types';
-import { db } from "@/lib/firebase";
+import { db } from '../firebase';
 import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from "firebase/firestore";
-
-
 
 const AdminAirports = () => {
   const navigate = useNavigate();
   const [airports, setAirports] = useState<Airport[]>([]);
-
-useEffect(() => {
-  const fetchAirports = async () => {
-    const querySnapshot = await getDocs(collection(db, "airports"));
-    const loadedAirports = querySnapshot.docs.map(doc => ({
-      ...doc.data(),
-      id: doc.id, // Firestore doc ID
-    })) as Airport[];
-    setAirports(loadedAirports);
-  };
-
-  fetchAirports();
-}, []);
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -44,52 +30,62 @@ useEffect(() => {
     }
   }, [navigate]);
 
-  
-    
+  useEffect(() => {
+    const fetchAirports = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "airports"));
+        const loadedAirports = querySnapshot.docs.map(doc => ({
+          ...doc.data(),
+          id: doc.id,
+        })) as Airport[];
+        setAirports(loadedAirports);
+      } catch (error) {
+        console.error('Error fetching airports:', error);
+        toast.error('Failed to load airports');
+      }
+    };
 
-const handleAddAirport = async (e: React.FormEvent) => {
-  e.preventDefault();
-  const code = generateAirportCode(newAirport.city);
+    fetchAirports();
+  }, []);
 
-  if (airports.some(airport => airport.code === code)) {
-    toast.error('Airport with similar code already exists');
-    return;
-  }
-
-  const airport: Airport = {
-    code,
-    ...newAirport
+  const generateAirportCode = (city: string): string => {
+    return city
+      .replace(/[^a-zA-Z]/g, '')
+      .slice(0, 3)
+      .toUpperCase();
   };
 
-  try {
-    const docRef = await addDoc(collection(db, "airports"), airport);
-    setAirports([...airports, { ...airport, id: docRef.id }]);
-    toast.success('Airport added successfully');
-    setShowAddForm(false);
-    setNewAirport({
-      id: '',
-      name: '',
-      city: '',
-      country: '',
-      latitude: 0,
-      longitude: 0
-    });
-  } catch (error) {
-    toast.error("Failed to add airport.");
-    console.error(error);
-  }
-};
+  const handleAddAirport = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const code = generateAirportCode(newAirport.city);
 
-    setShowAddForm(false);
-    setNewAirport({
-      id: '',
-      name: '',
-      city: '',
-      country: '',
-      latitude: 0,
-      longitude: 0
-    });
-    toast.success('Airport added successfully');
+    if (airports.some(airport => airport.code === code)) {
+      toast.error('Airport with similar code already exists');
+      return;
+    }
+
+    const airport: Airport = {
+      code,
+      ...newAirport
+    };
+
+    try {
+      const docRef = await addDoc(collection(db, "airports"), airport);
+      setAirports([...airports, { ...airport, id: docRef.id }]);
+      toast.success('Airport added successfully');
+      setShowAddForm(false);
+      setNewAirport({
+        id: '',
+        name: '',
+        city: '',
+        country: '',
+        latitude: 0,
+        longitude: 0
+      });
+    } catch (error) {
+      toast.error("Failed to add airport.");
+      console.error(error);
+    }
   };
 
   const handleEditAirport = (airport: Airport) => {
@@ -97,29 +93,47 @@ const handleAddAirport = async (e: React.FormEvent) => {
     setEditAirport(airport);
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (!editAirport) return;
 
-    setAirports(airports.map(airport => 
-      airport.code === editingId ? editAirport : airport
-    ));
-    setEditingId(null);
-    setEditAirport(null);
-    toast.success('Airport updated successfully');
-  };
+    try {
+      const airportDoc = doc(db, 'airports', editAirport.id);
+      await updateDoc(airportDoc, {
+        name: editAirport.name,
+        city: editAirport.city,
+        country: editAirport.country,
+        latitude: editAirport.latitude,
+        longitude: editAirport.longitude
+      });
 
-  const handleDeleteAirport = (code: string) => {
-    if (window.confirm('Are you sure you want to delete this airport?')) {
-      setAirports(airports.filter(airport => airport.code !== code));
-      toast.success('Airport deleted successfully');
+      setAirports(airports.map(airport => 
+        airport.code === editingId ? editAirport : airport
+      ));
+      setEditingId(null);
+      setEditAirport(null);
+      toast.success('Airport updated successfully');
+    } catch (error) {
+      console.error('Error updating airport:', error);
+      toast.error('Failed to update airport');
     }
   };
 
-  const generateAirportCode = (city: string): string => {
-    return city
-      .replace(/[^a-zA-Z]/g, '')
-      .slice(0, 3)
-      .toUpperCase();
+  const handleDeleteAirport = async (code: string) => {
+    if (window.confirm('Are you sure you want to delete this airport?')) {
+      const airport = airports.find(a => a.code === code);
+      if (!airport) return;
+
+      try {
+        const airportDoc = doc(db, 'airports', airport.id);
+        await deleteDoc(airportDoc);
+        
+        setAirports(airports.filter(airport => airport.code !== code));
+        toast.success('Airport deleted successfully');
+      } catch (error) {
+        console.error('Error deleting airport:', error);
+        toast.error('Failed to delete airport');
+      }
+    }
   };
 
   const filteredAirports = airports.filter(airport =>
@@ -269,7 +283,7 @@ const handleAddAirport = async (e: React.FormEvent) => {
                         type="text"
                         className="w-full px-2 py-1 border rounded"
                         value={editAirport?.name}
-                       onChange={(e) => setEditAirport((prev: Airport | null) => prev ? { ...prev, name: e.target.value } : null)}
+                        onChange={(e) => setEditAirport((prev: Airport | null) => prev ? { ...prev, name: e.target.value } : null)}
                       />
                     ) : (
                       airport.name
@@ -282,13 +296,13 @@ const handleAddAirport = async (e: React.FormEvent) => {
                           type="text"
                           className="w-full px-2 py-1 border rounded"
                           value={editAirport?.city}
-                          onChange={(e) => setEditAirport((prev: Airport | null) => prev ? { ...prev, name: e.target.value } : null)}
+                          onChange={(e) => setEditAirport((prev: Airport | null) => prev ? { ...prev, city: e.target.value } : null)}
                         />
                         <input
                           type="text"
                           className="w-full px-2 py-1 border rounded"
                           value={editAirport?.country}
-                          onChange={(e) => setEditAirport((prev: Airport | null) => prev ? { ...prev, name: e.target.value } : null)}
+                          onChange={(e) => setEditAirport((prev: Airport | null) => prev ? { ...prev, country: e.target.value } : null)}
                         />
                       </div>
                     ) : (
@@ -306,14 +320,14 @@ const handleAddAirport = async (e: React.FormEvent) => {
                           step="any"
                           className="w-full px-2 py-1 border rounded"
                           value={editAirport?.latitude}
-                          onChange={(e) => setEditAirport((prev: Airport | null) => prev ? { ...prev, name: e.target.value } : null)}
+                          onChange={(e) => setEditAirport((prev: Airport | null) => prev ? { ...prev, latitude: parseFloat(e.target.value) } : null)}
                         />
                         <input
                           type="number"
                           step="any"
                           className="w-full px-2 py-1 border rounded"
                           value={editAirport?.longitude}
-                          onChange={(e) => setEditAirport((prev: Airport | null) => prev ? { ...prev, name: e.target.value } : null)}
+                          onChange={(e) => setEditAirport((prev: Airport | null) => prev ? { ...prev, longitude: parseFloat(e.target.value) } : null)}
                         />
                       </div>
                     ) : (
