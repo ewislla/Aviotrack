@@ -15,7 +15,7 @@ import {
   Check,
 } from "lucide-react";
 import Select from "react-select";
-//import { mockFlights, mockBookings, saveFlights } from '../data';
+import { mockBookings } from '../data';
 import { airports } from "../data/airports";
 import {
   Airport,
@@ -70,6 +70,7 @@ const AdminDashboard = () => {
   const [flightPlanRequests, setFlightPlanRequests] = useState<
     FlightPlanRequest[]
   >([]);
+  const [flights, setFlights] = useState<Flight[]>([]);
 
   useEffect(() => {
     const fetchFlights = async () => {
@@ -188,7 +189,7 @@ const AdminDashboard = () => {
     return seats;
   };
 
-  const handleAddFlight = () => {
+  const handleAddFlight = async () => {
     if (!newFlight.origin || !newFlight.destination) {
       toast.error("Please select both origin and destination airports");
       return;
@@ -242,18 +243,25 @@ const AdminDashboard = () => {
     setShowPriceModal(true);
   };
 
-  const handleSavePrices = () => {
+  const handleSavePrices = async () => {
     if (selectedFlight) {
-      const flightIndex = mockFlights.findIndex(
-        (f) => f.id === selectedFlight.id,
-      );
-      if (flightIndex !== -1) {
+      try {
         await updateDoc(doc(db, "flights", selectedFlight.id), {
           economyPrice: prices.economy,
           businessPrice: prices.business,
           firstClassPrice: prices.firstClass,
         });
         toast.success("Prices updated in Firestore");
+        
+        // Update local state
+        setFlights(prev => prev.map(flight => 
+          flight.id === selectedFlight.id 
+            ? { ...flight, economyPrice: prices.economy, businessPrice: prices.business, firstClassPrice: prices.firstClass }
+            : flight
+        ));
+      } catch (error) {
+        console.error("Error updating prices:", error);
+        toast.error("Failed to update prices");
       }
     }
     setShowPriceModal(false);
@@ -663,7 +671,7 @@ const AdminDashboard = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {flights.map((flight) => ((flight) => (
+                  {flights.map((flight) => (
                     <tr key={flight.id}>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {editingFlight === flight.id ? (
