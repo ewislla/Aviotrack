@@ -1,114 +1,186 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Table, Edit2, Save, X, Users, Plane, Plus, DollarSign, MapPin, Mail, Calendar, Check } from 'lucide-react';
-import Select from 'react-select';
-import { toast } from 'react-hot-toast';
-import { Flight, Booking, Airport, FlightPlanRequest } from '../types';
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import {
-  getAllFlights,
-  addFlight,
-  updateFlight,
-  getAllBookings,
-  getAllAirports,
-  getAllFlightPlanRequests,
-  updateFlightPlanRequest
-} from '../services/firebaseService';
+  Table,
+  Edit2,
+  Save,
+  X,
+  Users,
+  Plane,
+  Plus,
+  DollarSign,
+  MapPin,
+  Mail,
+  Calendar,
+  Check,
+} from "lucide-react";
+import Select from "react-select";
+//import { mockFlights, mockBookings, saveFlights } from '../data';
+import { airports } from "../data/airports";
+import {
+  Airport,
+  Seat,
+  Flight,
+  Booking,
+  NewFlight,
+  FlightPlanRequest,
+} from "../types";
+import { toast } from "react-hot-toast";
+import {
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  addDoc,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
+import { db } from "../firebase";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('flights');
-  const [flights, setFlights] = useState([]);
-  const [bookings, setBookings] = useState([]);
-  const [airports, setAirports] = useState([]);
-  const [flightPlanRequests, setFlightPlanRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [editingFlight, setEditingFlight] = useState(null);
-  const [editedFlightData, setEditedFlightData] = useState(null);
+  const [activeTab, setActiveTab] = useState<
+    "flights" | "bookings" | "requests"
+  >("flights");
+  const [editingFlight, setEditingFlight] = useState<string | null>(null);
+  const [editedFlightData, setEditedFlightData] = useState<Flight | null>(null);
   const [showAddFlight, setShowAddFlight] = useState(false);
-  const [newFlight, setNewFlight] = useState({
-    airline: '',
-    flightNumber: '',
-    origin: '',
-    destination: '',
-    scheduledDeparture: '',
-    scheduledArrival: '',
-    terminal: '',
-    gate: '',
-    aircraftType: '',
+  const [showPriceModal, setShowPriceModal] = useState(false);
+  const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
+  const [prices, setPrices] = useState({
+    economy: 0,
+    business: 0,
+    firstClass: 0,
+  });
+  const [newFlight, setNewFlight] = useState<NewFlight>({
+    airline: "",
+    flightNumber: "",
+    origin: "",
+    destination: "",
+    scheduledDeparture: "",
+    scheduledArrival: "",
+    terminal: "",
+    gate: "",
+    aircraftType: "",
     economyPrice: 0,
     businessPrice: 0,
-    firstClassPrice: 0
+    firstClassPrice: 0,
   });
 
+  const [flightPlanRequests, setFlightPlanRequests] = useState<
+    FlightPlanRequest[]
+  >([]);
+
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem('isAdminLoggedIn');
+    const fetchFlights = async () => {
+      const q = query(collection(db, "flights"), orderBy("scheduledDeparture"));
+      const snapshot = await getDocs(q);
+      const fetchedFlights = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Flight[];
+      setFlights(fetchedFlights);
+    };
+
+    fetchFlights();
+  }, []);
+
+  const updateRequestStatus = (
+    requestId: string,
+    newStatus: FlightPlanRequest["status"],
+  ) => {
+    const updatedRequests = flightPlanRequests.map((request) =>
+      request.id === requestId ? { ...request, status: newStatus } : request,
+    );
+    setFlightPlanRequests(updatedRequests);
+    localStorage.setItem("flightPlanRequests", JSON.stringify(updatedRequests));
+    toast.success("Request status updated");
+  };
+
+  const airportOptions = airports.map((airport: Airport) => ({
+    value: airport.code,
+    label: `${airport.city} (${airport.code}) - ${airport.name}, ${airport.country}`,
+  }));
+
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem("isAdminLoggedIn");
     if (!isLoggedIn) {
-      navigate('/admin/login');
-      return;
+      navigate("/admin/login");
     }
-    loadData();
   }, [navigate]);
 
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const [flightsData, bookingsData, airportsData, requestsData] = await Promise.all([
-        getAllFlights(),
-        getAllBookings(),
-        getAllAirports(),
-        getAllFlightPlanRequests()
-      ]);
-      
-const [flights, setFlights] = useState<Flight[]>([]);
-const [bookings, setBookings] = useState<Booking[]>([]);
-const [airports, setAirports] = useState<Airport[]>([]);
-const [flightPlanRequests, setFlightPlanRequests] = useState<FlightPlanRequest[]>([]);
-    } catch (error) {
-      console.error('Error loading data:', error);
-      toast.error('Error loading data');
-    } finally {
-      setLoading(false);
+  const handleLogout = () => {
+    localStorage.removeItem("isAdminLoggedIn");
+    navigate("/admin/login");
+  };
+
+  const handleEditFlight = (flight: Flight) => {
+    setEditingFlight(flight.id);
+    setEditedFlightData(flight);
+  };
+
+  const handleSaveEdit = () => {
+    if (editedFlightData) {
+      const flightIndex = mockFlights.findIndex(
+        (f) => f.id === editedFlightData.id,
+      );
+      if (flightIndex !== -1) {
+        mockFlights[flightIndex] = editedFlightData;
+        saveFlights(mockFlights);
+        toast.success("Flight updated successfully");
+      }
+      setEditingFlight(null);
+      setEditedFlightData(null);
     }
   };
 
-  const generateSeats = (economyPrice: number, businessPrice: number, firstClassPrice: number) => {
+  const handleCancelEdit = () => {
+    setEditingFlight(null);
+    setEditedFlightData(null);
+  };
+
+  const generateSeats = (
+    economyPrice: number,
+    businessPrice: number,
+    firstClassPrice: number,
+  ) => {
     const seats = [];
-    
+
     // First Class (Rows 1-2)
     for (let row = 1; row <= 2; row++) {
-      for (let col of ['A', 'C', 'D', 'F']) {
+      for (let col of ["A", "C", "D", "F"]) {
         seats.push({
           id: `${row}${col}`,
           number: `${row}${col}`,
-          class: 'First Class',
-          status: 'Available',
-          price: firstClassPrice
+          class: "First Class" as const,
+          status: "Available" as const,
+          price: firstClassPrice,
         });
       }
     }
 
     // Business Class (Rows 3-7)
     for (let row = 3; row <= 7; row++) {
-      for (let col of ['A', 'C', 'D', 'F']) {
+      for (let col of ["A", "C", "D", "F"]) {
         seats.push({
           id: `${row}${col}`,
           number: `${row}${col}`,
-          class: 'Business',
-          status: 'Available',
-          price: businessPrice
+          class: "Business" as const,
+          status: "Available" as const,
+          price: businessPrice,
         });
       }
     }
 
     // Economy Class (Rows 8-32)
     for (let row = 8; row <= 32; row++) {
-      for (let col of ['A', 'B', 'C', 'D', 'E', 'F']) {
+      for (let col of ["A", "B", "C", "D", "E", "F"]) {
         seats.push({
           id: `${row}${col}`,
           number: `${row}${col}`,
-          class: 'Economy',
-          status: 'Available',
-          price: economyPrice
+          class: "Economy" as const,
+          status: "Available" as const,
+          price: economyPrice,
         });
       }
     }
@@ -116,125 +188,88 @@ const [flightPlanRequests, setFlightPlanRequests] = useState<FlightPlanRequest[]
     return seats;
   };
 
-  const handleAddFlight = async () => {
+  const handleAddFlight = () => {
     if (!newFlight.origin || !newFlight.destination) {
-      toast.error('Please select both origin and destination airports');
+      toast.error("Please select both origin and destination airports");
       return;
     }
 
     if (newFlight.origin === newFlight.destination) {
-      toast.error('Origin and destination cannot be the same');
+      toast.error("Origin and destination cannot be the same");
       return;
     }
 
-    try {
-      const flightData = {
-        ...newFlight,
-        actualDeparture: '',
-        actualArrival: '',
-        status: 'On Time',
-        seats: generateSeats(newFlight.economyPrice, newFlight.businessPrice, newFlight.firstClassPrice)
-      };
+    const flight: Flight = {
+      id: Math.random().toString(36).substr(2, 9),
+      ...newFlight,
+      actualDeparture: "",
+      actualArrival: "",
+      status: "On Time",
+      seats: generateSeats(
+        newFlight.economyPrice,
+        newFlight.businessPrice,
+        newFlight.firstClassPrice,
+      ),
+    };
 
-      await addFlight(flightData);
-      await loadData(); // Refresh data
-      setShowAddFlight(false);
-      setNewFlight({
-        airline: '',
-        flightNumber: '',
-        origin: '',
-        destination: '',
-        scheduledDeparture: '',
-        scheduledArrival: '',
-        terminal: '',
-        gate: '',
-        aircraftType: '',
-        economyPrice: 0,
-        businessPrice: 0,
-        firstClassPrice: 0
-      });
-      toast.success('Flight added successfully');
-    } catch (error) {
-      console.error('Error adding flight:', error);
-      toast.error('Error adding flight');
-    }
+    await addDoc(collection(db, "flights"), flight);
+    toast.success("Flight added to Firestore");
+    setShowAddFlight(false);
+    setNewFlight({
+      airline: "",
+      flightNumber: "",
+      origin: "",
+      destination: "",
+      scheduledDeparture: "",
+      scheduledArrival: "",
+      terminal: "",
+      gate: "",
+      aircraftType: "",
+      economyPrice: 0,
+      businessPrice: 0,
+      firstClassPrice: 0,
+    });
+    toast.success("Flight added successfully");
   };
-
-  const handleSaveEdit = async () => {
-    if (editedFlightData) {
-      try {
-        await updateFlight(editedFlightData.id, editedFlightData);
-        await loadData(); // Refresh data
-        setEditingFlight(null);
-        setEditedFlightData(null);
-        toast.success('Flight updated successfully');
-      } catch (error) {
-        console.error('Error updating flight:', error);
-        toast.error('Error updating flight');
-      }
-    }
-  };
-
-  const updateRequestStatus = async (requestId, newStatus) => {
-    try {
-      await updateFlightPlanRequest(requestId, { status: newStatus });
-      await loadData(); // Refresh data
-      toast.success('Request status updated');
-    } catch (error) {
-      console.error('Error updating request status:', error);
-      toast.error('Error updating request status');
-    }
-  };
-
-  
 
   const openPriceModal = (flight: Flight) => {
     setSelectedFlight(flight);
     setPrices({
       economy: flight.economyPrice,
       business: flight.businessPrice,
-      firstClass: flight.firstClassPrice
+      firstClass: flight.firstClassPrice,
     });
     setShowPriceModal(true);
   };
 
   const handleSavePrices = () => {
     if (selectedFlight) {
-      const flightIndex = mockFlights.findIndex(f => f.id === selectedFlight.id);
+      const flightIndex = mockFlights.findIndex(
+        (f) => f.id === selectedFlight.id,
+      );
       if (flightIndex !== -1) {
-        mockFlights[flightIndex] = {
-          ...mockFlights[flightIndex],
+        await updateDoc(doc(db, "flights", selectedFlight.id), {
           economyPrice: prices.economy,
           businessPrice: prices.business,
-          firstClassPrice: prices.firstClass
-        };
-        saveFlights(mockFlights);
-        toast.success('Prices updated successfully');
+          firstClassPrice: prices.firstClass,
+        });
+        toast.success("Prices updated in Firestore");
       }
     }
     setShowPriceModal(false);
   };
 
-  const getStatusColor = (status: FlightPlanRequest['status']) => {
+  const getStatusColor = (status: FlightPlanRequest["status"]) => {
     switch (status) {
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'contacted':
-        return 'bg-blue-100 text-blue-800';
-      case 'completed':
-        return 'bg-green-100 text-green-800';
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "contacted":
+        return "bg-blue-100 text-blue-800";
+      case "completed":
+        return "bg-green-100 text-green-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
-  };
-  
-const AdminDashboard = () => {
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    // Example logout logic
-    localStorage.removeItem('user'); // Or whatever key you use
-    navigate('/login');
   };
 
   return (
@@ -263,33 +298,33 @@ const AdminDashboard = () => {
           <div className="flex">
             <button
               className={`px-6 py-3 flex items-center space-x-2 ${
-                activeTab === 'flights'
-                  ? 'border-b-2 border-blue-600 text-blue-600'
-                  : 'text-gray-500 hover:text-gray-700'
+                activeTab === "flights"
+                  ? "border-b-2 border-blue-600 text-blue-600"
+                  : "text-gray-500 hover:text-gray-700"
               }`}
-              onClick={() => setActiveTab('flights')}
+              onClick={() => setActiveTab("flights")}
             >
               <Plane className="h-5 w-5" />
               <span>Flights</span>
             </button>
             <button
               className={`px-6 py-3 flex items-center space-x-2 ${
-                activeTab === 'bookings'
-                  ? 'border-b-2 border-blue-600 text-blue-600'
-                  : 'text-gray-500 hover:text-gray-700'
+                activeTab === "bookings"
+                  ? "border-b-2 border-blue-600 text-blue-600"
+                  : "text-gray-500 hover:text-gray-700"
               }`}
-              onClick={() => setActiveTab('bookings')}
+              onClick={() => setActiveTab("bookings")}
             >
               <Users className="h-5 w-5" />
               <span>Bookings</span>
             </button>
             <button
               className={`px-6 py-3 flex items-center space-x-2 ${
-                activeTab === 'requests'
-                  ? 'border-b-2 border-blue-600 text-blue-600'
-                  : 'text-gray-500 hover:text-gray-700'
+                activeTab === "requests"
+                  ? "border-b-2 border-blue-600 text-blue-600"
+                  : "text-gray-500 hover:text-gray-700"
               }`}
-              onClick={() => setActiveTab('requests')}
+              onClick={() => setActiveTab("requests")}
             >
               <Calendar className="h-5 w-5" />
               <span>Flight Plan Requests</span>
@@ -298,7 +333,7 @@ const AdminDashboard = () => {
         </div>
 
         <div className="p-6">
-          {activeTab === 'flights' && (
+          {activeTab === "flights" && (
             <div className="mb-6">
               <button
                 onClick={() => setShowAddFlight(true)}
@@ -315,114 +350,193 @@ const AdminDashboard = () => {
               <h2 className="text-xl font-semibold mb-4">Add New Flight</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Airline</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Airline
+                  </label>
                   <input
                     type="text"
                     className="w-full border rounded-md px-3 py-2"
                     value={newFlight.airline}
-                    onChange={(e) => setNewFlight({...newFlight, airline: e.target.value})}
+                    onChange={(e) =>
+                      setNewFlight({ ...newFlight, airline: e.target.value })
+                    }
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Flight Number</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Flight Number
+                  </label>
                   <input
                     type="text"
                     className="w-full border rounded-md px-3 py-2"
                     value={newFlight.flightNumber}
-                    onChange={(e) => setNewFlight({...newFlight, flightNumber: e.target.value})}
+                    onChange={(e) =>
+                      setNewFlight({
+                        ...newFlight,
+                        flightNumber: e.target.value,
+                      })
+                    }
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Origin</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Origin
+                  </label>
                   <Select
                     options={airportOptions}
-                    value={airportOptions.find(option => option.value === newFlight.origin)}
-                    onChange={(option) => setNewFlight({...newFlight, origin: option?.value || ''})}
+                    value={airportOptions.find(
+                      (option) => option.value === newFlight.origin,
+                    )}
+                    onChange={(option) =>
+                      setNewFlight({
+                        ...newFlight,
+                        origin: option?.value || "",
+                      })
+                    }
                     className="text-sm"
                     placeholder="Select origin airport"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Destination</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Destination
+                  </label>
                   <Select
                     options={airportOptions}
-                    value={airportOptions.find(option => option.value === newFlight.destination)}
-                    onChange={(option) => setNewFlight({...newFlight, destination: option?.value || ''})}
+                    value={airportOptions.find(
+                      (option) => option.value === newFlight.destination,
+                    )}
+                    onChange={(option) =>
+                      setNewFlight({
+                        ...newFlight,
+                        destination: option?.value || "",
+                      })
+                    }
                     className="text-sm"
                     placeholder="Select destination airport"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Scheduled Departure</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Scheduled Departure
+                  </label>
                   <input
                     type="datetime-local"
                     className="w-full border rounded-md px-3 py-2"
                     value={newFlight.scheduledDeparture}
-                    onChange={(e) => setNewFlight({...newFlight, scheduledDeparture: e.target.value})}
+                    onChange={(e) =>
+                      setNewFlight({
+                        ...newFlight,
+                        scheduledDeparture: e.target.value,
+                      })
+                    }
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Scheduled Arrival</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Scheduled Arrival
+                  </label>
                   <input
                     type="datetime-local"
                     className="w-full border rounded-md px-3 py-2"
                     value={newFlight.scheduledArrival}
-                    onChange={(e) => setNewFlight({...newFlight, scheduledArrival: e.target.value})}
+                    onChange={(e) =>
+                      setNewFlight({
+                        ...newFlight,
+                        scheduledArrival: e.target.value,
+                      })
+                    }
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Terminal</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Terminal
+                  </label>
                   <input
                     type="text"
                     className="w-full border rounded-md px-3 py-2"
                     value={newFlight.terminal}
-                    onChange={(e) => setNewFlight({...newFlight, terminal: e.target.value})}
+                    onChange={(e) =>
+                      setNewFlight({ ...newFlight, terminal: e.target.value })
+                    }
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Gate</label>
-                
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Gate
+                  </label>
+
                   <input
                     type="text"
                     className="w-full border rounded-md px-3 py-2"
                     value={newFlight.gate}
-                    onChange={(e) => setNewFlight({...newFlight, gate: e.target.value})}
+                    onChange={(e) =>
+                      setNewFlight({ ...newFlight, gate: e.target.value })
+                    }
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Aircraft Type</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Aircraft Type
+                  </label>
                   <input
                     type="text"
                     className="w-full border rounded-md px-3 py-2"
                     value={newFlight.aircraftType}
-                    onChange={(e) => setNewFlight({...newFlight, aircraftType: e.target.value})}
+                    onChange={(e) =>
+                      setNewFlight({
+                        ...newFlight,
+                        aircraftType: e.target.value,
+                      })
+                    }
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Economy Price</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Economy Price
+                  </label>
                   <input
                     type="number"
                     className="w-full border rounded-md px-3 py-2"
                     value={newFlight.economyPrice}
-                    onChange={(e) => setNewFlight({...newFlight, economyPrice: parseInt(e.target.value)})}
+                    onChange={(e) =>
+                      setNewFlight({
+                        ...newFlight,
+                        economyPrice: parseInt(e.target.value),
+                      })
+                    }
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Business Price</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Business Price
+                  </label>
                   <input
                     type="number"
                     className="w-full border rounded-md px-3 py-2"
                     value={newFlight.businessPrice}
-                    onChange={(e) => setNewFlight({...newFlight, businessPrice: parseInt(e.target.value)})}
+                    onChange={(e) =>
+                      setNewFlight({
+                        ...newFlight,
+                        businessPrice: parseInt(e.target.value),
+                      })
+                    }
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">First Class Price</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    First Class Price
+                  </label>
                   <input
                     type="number"
                     className="w-full border rounded-md px-3 py-2"
                     value={newFlight.firstClassPrice}
-                    onChange={(e) => setNewFlight({...newFlight, firstClassPrice: parseInt(e.target.value)})}
+                    onChange={(e) =>
+                      setNewFlight({
+                        ...newFlight,
+                        firstClassPrice: parseInt(e.target.value),
+                      })
+                    }
                   />
                 </div>
               </div>
@@ -446,40 +560,63 @@ const AdminDashboard = () => {
           {showPriceModal && selectedFlight && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
               <div className="bg-white rounded-lg p-6 w-96">
-                <h2 className="text-xl font-semibold mb-4">Edit Flight Prices</h2>
+                <h2 className="text-xl font-semibold mb-4">
+                  Edit Flight Prices
+                </h2>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Economy Price</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Economy Price
+                    </label>
                     <div className="relative">
                       <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                       <input
                         type="number"
                         value={prices.economy}
-                        onChange={(e) => setPrices({ ...prices, economy: parseInt(e.target.value) })}
+                        onChange={(e) =>
+                          setPrices({
+                            ...prices,
+                            economy: parseInt(e.target.value),
+                          })
+                        }
                         className="pl-10 w-full px-4 py-2 border rounded-md"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Business Price</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Business Price
+                    </label>
                     <div className="relative">
                       <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                       <input
                         type="number"
                         value={prices.business}
-                        onChange={(e) => setPrices({ ...prices, business: parseInt(e.target.value) })}
+                        onChange={(e) =>
+                          setPrices({
+                            ...prices,
+                            business: parseInt(e.target.value),
+                          })
+                        }
                         className="pl-10 w-full px-4 py-2 border rounded-md"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">First Class Price</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      First Class Price
+                    </label>
                     <div className="relative">
                       <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                       <input
                         type="number"
                         value={prices.firstClass}
-                        onChange={(e) => setPrices({ ...prices, firstClass: parseInt(e.target.value) })}
+                        onChange={(e) =>
+                          setPrices({
+                            ...prices,
+                            firstClass: parseInt(e.target.value),
+                          })
+                        }
                         className="pl-10 w-full px-4 py-2 border rounded-md"
                       />
                     </div>
@@ -503,7 +640,7 @@ const AdminDashboard = () => {
             </div>
           )}
 
-          {activeTab === 'flights' ? (
+          {activeTab === "flights" ? (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead>
@@ -526,7 +663,7 @@ const AdminDashboard = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {mockFlights.map((flight) => (
+                  {flights.map((flight) => ((flight) => (
                     <tr key={flight.id}>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {editingFlight === flight.id ? (
@@ -535,10 +672,14 @@ const AdminDashboard = () => {
                             className="border rounded px-2 py-1"
                             value={editedFlightData?.flightNumber}
                             onChange={(e) =>
-                              setEditedFlightData(prev => prev ? {
-                                ...prev,
-                                flightNumber: e.target.value
-                              } : null)
+                              setEditedFlightData((prev) =>
+                                prev
+                                  ? {
+                                      ...prev,
+                                      flightNumber: e.target.value,
+                                    }
+                                  : null,
+                              )
                             }
                           />
                         ) : (
@@ -554,10 +695,15 @@ const AdminDashboard = () => {
                             className="border rounded px-2 py-1"
                             value={editedFlightData?.status}
                             onChange={(e) =>
-                              setEditedFlightData(prev => prev ? {
-                                ...prev,
-                                status: e.target.value as Flight['status']
-                              } : null)
+                              setEditedFlightData((prev) =>
+                                prev
+                                  ? {
+                                      ...prev,
+                                      status: e.target
+                                        .value as Flight["status"],
+                                    }
+                                  : null,
+                              )
                             }
                           >
                             <option value="On Time">On Time</option>
@@ -566,12 +712,17 @@ const AdminDashboard = () => {
                             <option value="Landed">Landed</option>
                           </select>
                         ) : (
-                          <span className={`px-2 py-1 rounded-full text-sm ${
-                            flight.status === 'On Time' ? 'bg-green-100 text-green-800' :
-                            flight.status === 'Delayed' ? 'bg-yellow-100 text-yellow-800' :
-                            flight.status === 'Cancelled' ? 'bg-red-100 text-red-800' :
-                            'bg-blue-100 text-blue-800'
-                          }`}>
+                          <span
+                            className={`px-2 py-1 rounded-full text-sm ${
+                              flight.status === "On Time"
+                                ? "bg-green-100 text-green-800"
+                                : flight.status === "Delayed"
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : flight.status === "Cancelled"
+                                    ? "bg-red-100 text-red-800"
+                                    : "bg-blue-100 text-blue-800"
+                            }`}
+                          >
                             {flight.status}
                           </span>
                         )}
@@ -615,7 +766,7 @@ const AdminDashboard = () => {
                 </tbody>
               </table>
             </div>
-          ) : activeTab === 'bookings' ? (
+          ) : activeTab === "bookings" ? (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead>
@@ -705,32 +856,44 @@ const AdminDashboard = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <p className="text-sm text-gray-600">Start: {new Date(request.startDate).toLocaleDateString()}</p>
-                          <p className="text-sm text-gray-600">End: {new Date(request.endDate).toLocaleDateString()}</p>
+                          <p className="text-sm text-gray-600">
+                            Start:{" "}
+                            {new Date(request.startDate).toLocaleDateString()}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            End:{" "}
+                            {new Date(request.endDate).toLocaleDateString()}
+                          </p>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {request.budget}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(request.status)}`}>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs ${getStatusColor(request.status)}`}
+                        >
                           {request.status}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex space-x-2">
-                          {request.status === 'pending' && (
+                          {request.status === "pending" && (
                             <button
-                              onClick={() => updateRequestStatus(request.id, 'contacted')}
+                              onClick={() =>
+                                updateRequestStatus(request.id, "contacted")
+                              }
                               className="text-blue-600 hover:text-blue-800"
                               title="Mark as Contacted"
                             >
                               <Mail className="h-5 w-5" />
                             </button>
                           )}
-                          {request.status === 'contacted' && (
+                          {request.status === "contacted" && (
                             <button
-                              onClick={() => updateRequestStatus(request.id, 'completed')}
+                              onClick={() =>
+                                updateRequestStatus(request.id, "completed")
+                              }
                               className="text-green-600 hover:text-green-800"
                               title="Mark as Completed"
                             >
@@ -750,4 +913,5 @@ const AdminDashboard = () => {
     </div>
   );
 };
+
 export default AdminDashboard;
