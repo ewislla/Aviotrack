@@ -15,7 +15,7 @@ import {
   Check,
 } from "lucide-react";
 import Select from "react-select";
-import { mockBookings } from '../data';
+import { mockBookings } from "../data";
 import { airports } from "../data/airports";
 import {
   Airport,
@@ -252,13 +252,20 @@ const AdminDashboard = () => {
           firstClassPrice: prices.firstClass,
         });
         toast.success("Prices updated in Firestore");
-        
+
         // Update local state
-        setFlights(prev => prev.map(flight => 
-          flight.id === selectedFlight.id 
-            ? { ...flight, economyPrice: prices.economy, businessPrice: prices.business, firstClassPrice: prices.firstClass }
-            : flight
-        ));
+        setFlights((prev) =>
+          prev.map((flight) =>
+            flight.id === selectedFlight.id
+              ? {
+                  ...flight,
+                  economyPrice: prices.economy,
+                  businessPrice: prices.business,
+                  firstClassPrice: prices.firstClass,
+                }
+              : flight,
+          ),
+        );
       } catch (error) {
         console.error("Error updating prices:", error);
         toast.error("Failed to update prices");
@@ -410,8 +417,8 @@ const AdminDashboard = () => {
                     Destination
                   </label>
                   <Select
-                    options={airportOptions}
-                    value={airportOptions.find(
+                    options={options}
+                    value={options.find(
                       (option) => option.value === newFlight.destination,
                     )}
                     onChange={(option) =>
