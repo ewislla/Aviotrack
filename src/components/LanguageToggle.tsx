@@ -14,7 +14,7 @@ const LanguageToggle = () => {
 
   const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
 
-  const handleLanguageChange = (languageCode) => {
+  const handleLanguageChange = (languageCode: string) => {
     i18n.changeLanguage(languageCode);
     setIsOpen(false);
   };

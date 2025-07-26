@@ -27,7 +27,7 @@ export const getAllFlights = async () => {
   }
 };
 
-export const addFlight = async (flightData) => {
+export const addFlight = async (flightData: any) => {
   try {
     const flightsCollection = collection(db, 'flights');
     const docRef = await addDoc(flightsCollection, {
@@ -41,7 +41,7 @@ export const addFlight = async (flightData) => {
   }
 };
 
-export const updateFlight = async (flightId, updates) => {
+export const updateFlight = async (flightId: string, updates: any) => {
   try {
     const flightDoc = doc(db, 'flights', flightId);
     await updateDoc(flightDoc, {
@@ -54,7 +54,7 @@ export const updateFlight = async (flightId, updates) => {
   }
 };
 
-export const deleteFlight = async (flightId) => {
+export const deleteFlight = async (flightId: string) => {
   try {
     const flightDoc = doc(db, 'flights', flightId);
     await deleteDoc(flightDoc);
@@ -79,7 +79,7 @@ export const getAllBookings = async () => {
   }
 };
 
-export const addBooking = async (bookingData) => {
+export const addBooking = async (bookingData: any) => {
   try {
     const bookingsCollection = collection(db, 'bookings');
     const docRef = await addDoc(bookingsCollection, {
@@ -108,7 +108,7 @@ export const getAllAirports = async () => {
   }
 };
 
-export const addAirport = async (airportData) => {
+export const addAirport = async (airportData: any) => {
   try {
     const airportsCollection = collection(db, 'airports');
     const docRef = await addDoc(airportsCollection, airportData);
@@ -119,7 +119,7 @@ export const addAirport = async (airportData) => {
   }
 };
 
-export const updateAirport = async (airportId, updates) => {
+export const updateAirport = async (airportId: string, updates: any) => {
   try {
     const airportDoc = doc(db, 'airports', airportId);
     await updateDoc(airportDoc, updates);
@@ -129,7 +129,7 @@ export const updateAirport = async (airportId, updates) => {
   }
 };
 
-export const deleteAirport = async (airportId) => {
+export const deleteAirport = async (airportId: string) => {
   try {
     const airportDoc = doc(db, 'airports', airportId);
     await deleteDoc(airportDoc);
@@ -154,7 +154,7 @@ export const getAllFlightPlanRequests = async () => {
   }
 };
 
-export const addFlightPlanRequest = async (requestData) => {
+export const addFlightPlanRequest = async (requestData: any) => {
   try {
     const requestsCollection = collection(db, 'flightPlanRequests');
     const docRef = await addDoc(requestsCollection, {
@@ -169,7 +169,7 @@ export const addFlightPlanRequest = async (requestData) => {
   }
 };
 
-export const updateFlightPlanRequest = async (requestId, updates) => {
+export const updateFlightPlanRequest = async (requestId: string, updates: any) => {
   try {
     const requestDoc = doc(db, 'flightPlanRequests', requestId);
     await updateDoc(requestDoc, updates);

@@ -19,11 +19,11 @@ const BookingConfirmation = () => {
       navigate('/book');
       return;
     }
-    
+
     const bookingData = location.state.booking;
     setBooking(bookingData);
     generateQRCode(bookingData.pnr);
-    
+
     // Save booking to Firebase
     saveBookingToFirebase(bookingData);
   }, [location.state, navigate]);
@@ -38,7 +38,7 @@ const BookingConfirmation = () => {
     }
   };
 
-  
+
   const generateQRCode = async (pnr: string) => {
     try {
       const qrCodeDataUrl = await QRCode.toDataURL(pnr);

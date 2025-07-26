@@ -122,12 +122,12 @@ const AdminDashboard = () => {
 
   const handleSaveEdit = () => {
     if (editedFlightData) {
-      const flightIndex = mockFlights.findIndex(
+      const flightIndex = flights.findIndex(
         (f) => f.id === editedFlightData.id,
       );
       if (flightIndex !== -1) {
-        mockFlights[flightIndex] = editedFlightData;
-        saveFlights(mockFlights);
+        flights[flightIndex] = editedFlightData;
+        saveFlights(flights);
         toast.success("Flight updated successfully");
       }
       setEditingFlight(null);
@@ -417,8 +417,8 @@ const AdminDashboard = () => {
                     Destination
                   </label>
                   <Select
-                    options={options}
-                    value={options.find(
+                    options={airportOptions}
+                    value={airportOptions.find(
                       (option) => option.value === newFlight.destination,
                     )}
                     onChange={(option) =>
