@@ -362,7 +362,7 @@ const AdminAirports = () => {
                             <Edit2 className="h-5 w-5" />
                           </button>
                           <button
-                            onClick={() => handleDeleteAirport(airport.code)}
+                            onClick={() => handleDeleteAirport(airport.id)}
                             className="text-red-600 hover:text-red-800"
                           >
                             <Trash2 className="h-5 w-5" />

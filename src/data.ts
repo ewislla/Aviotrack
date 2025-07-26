@@ -75,9 +75,9 @@ const savedBookings = localStorage.getItem('bookings');
 export const mockBookings: Booking[] = savedBookings ? JSON.parse(savedBookings) : [];
 
 // Save bookings to localStorage
-// export const saveBookings = (bookings: Booking[]) => {
-//   localStorage.setItem('bookings', JSON.stringify(bookings));
-// };
+export const saveBookings = (bookings: Booking[]) => {
+  localStorage.setItem('bookings', JSON.stringify(bookings));
+};
 
 export const mockFlights: Flight[] = [
   {
