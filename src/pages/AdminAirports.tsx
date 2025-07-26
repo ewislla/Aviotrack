@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plane, Search, Plus, Edit2, Save, X, Trash2 } from 'lucide-react';
@@ -275,8 +274,7 @@ const AdminAirports = () => {
                     <span className="font-mono text-sm">{airport.code}</span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    setAirports(airports.map(a => a.id === editingId ? editAirport : a));
-
+                    {editingId === airport.code ? (
                       <input
                         type="text"
                         className="w-full px-2 py-1 border rounded"
