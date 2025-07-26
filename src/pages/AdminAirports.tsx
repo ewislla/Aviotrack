@@ -118,23 +118,20 @@ const AdminAirports = () => {
     }
   };
 
-  const handleDeleteAirport = async (code: string) => {
-    if (window.confirm('Are you sure you want to delete this airport?')) {
-      const airport = airports.find(a => a.code === code);
-      if (!airport) return;
-
-      try {
-        const airportDoc = doc(db, 'airports', airport.id);
-        await deleteDoc(airportDoc);
-        
-        setAirports(airports.filter(airport => airport.code !== code));
-        toast.success('Airport deleted successfully');
-      } catch (error) {
-        console.error('Error deleting airport:', error);
-        toast.error('Failed to delete airport');
-      }
+ const handleDeleteAirport = async (id: string) => {
+  if (window.confirm('Are you sure you want to delete this airport?')) {
+    try {
+      const airportDoc = doc(db, 'airports', id);
+      await deleteDoc(airportDoc);
+      setAirports(airports.filter(airport => airport.id !== id));
+      toast.success('Airport deleted successfully');
+    } catch (error) {
+      console.error('Error deleting airport:', error);
+      toast.error('Failed to delete airport');
     }
-  };
+  }
+};
+
 
   const filteredAirports = airports.filter(airport =>
     airport.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -273,12 +270,13 @@ const AdminAirports = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredAirports.map((airport) => (
-                <tr key={airport.code}>
+                <tr key={airport.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="font-mono text-sm">{airport.code}</span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {editingId === airport.code ? (
+                    setAirports(airports.map(a => a.id === editingId ? editAirport : a));
+
                       <input
                         type="text"
                         className="w-full px-2 py-1 border rounded"
