@@ -1,8 +1,4 @@
 
-export const saveBookings = (bookings: any[]) => {
-  localStorage.setItem('bookings', JSON.stringify(bookings));
-};
-
 
 import { Flight, Booking, Seat, Destination, TripPlan } from './types';
 

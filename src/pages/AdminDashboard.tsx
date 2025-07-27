@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import Select from "react-select";
 import { mockBookings } from "../data";
-import { airports } from "../data/airports";
 import {
   Airport,
   Seat,
@@ -36,6 +35,7 @@ import {
   doc,
 } from "firebase/firestore";
 import { db } from "../firebase";
+
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -86,6 +86,7 @@ const AdminDashboard = () => {
     fetchFlights();
   }, []);
 
+  
   const updateRequestStatus = (
     requestId: string,
     newStatus: FlightPlanRequest["status"],
@@ -98,10 +99,32 @@ const AdminDashboard = () => {
     toast.success("Request status updated");
   };
 
-  const airportOptions = airports.map((airport: Airport) => ({
-    value: airport.code,
-    label: `${airport.city} (${airport.code}) - ${airport.name}, ${airport.country}`,
-  }));
+ const [airports, setAirports] = useState<Airport[]>([]);
+
+useEffect(() => {
+  const fetchAirports = async () => {
+    try {
+      const q = query(collection(db, "airports"), orderBy("city")); // or whatever field you want to order by
+      const snapshot = await getDocs(q);
+      const fetchedAirports = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Airport[];
+      setAirports(fetchedAirports);
+    } catch (error) {
+      console.error("Error fetching airports:", error);
+      toast.error("Failed to fetch airports");
+    }
+  };
+
+  fetchAirports();
+}, []);
+
+// Then use the fetched airports
+const airportOptions = airports.map((airport: Airport) => ({
+  value: airport.code,
+  label: `${airport.city} (${airport.code}) - ${airport.name}, ${airport.country}`,
+}));
 
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("isAdminLoggedIn");

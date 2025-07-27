@@ -1,10 +1,13 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plane, User, Mail, Users, CreditCard } from 'lucide-react';
 import Select from 'react-select';
 import { mockFlights } from '../data';
-import { airports, groupedAirports, countries } from '../data/airports';
 import { Flight } from '../types';
+import { Airport } from '../types'; // Add Airport type import
+
+import { collection, getDocs, query, orderBy } from "firebase/firestore";
+import { db } from "../firebase";
 
 const BookingPage = () => {
   const navigate = useNavigate();
@@ -22,40 +25,66 @@ const BookingPage = () => {
   const [selectedCountryFrom, setSelectedCountryFrom] = useState<string>('');
   const [selectedCountryTo, setSelectedCountryTo] = useState<string>('');
 
+
+
   const countryOptions = useMemo(() => 
-    countries.map(country => ({
-      value: country,
-      label: country
-    })),
-    []
-  );
+  countries.map(country => ({
+    value: country,
+    label: country
+  })),
+  [countries]
+);
 
-  const airportOptionsFrom = useMemo(() => 
-    selectedCountryFrom
-      ? groupedAirports[selectedCountryFrom]?.map(airport => ({
-          value: airport.code,
-          label: `${airport.city} (${airport.code}) - ${airport.name}`
-        })) || []
-      : airports.map(airport => ({
-          value: airport.code,
-          label: `${airport.city} (${airport.code}) - ${airport.name}, ${airport.country}`
-        })),
-    [selectedCountryFrom]
-  );
+const airportOptionsFrom = useMemo(() => 
+  selectedCountryFrom
+    ? groupedAirports[selectedCountryFrom]?.map(airport => ({
+        value: airport.code,
+        label: `${airport.city} (${airport.code}) - ${airport.name}`
+      })) || []
+    : airports.map(airport => ({
+        value: airport.code,
+        label: `${airport.city} (${airport.code}) - ${airport.name}, ${airport.country}`
+      })),
+  [selectedCountryFrom, groupedAirports, airports]
+);
 
-  const airportOptionsTo = useMemo(() => 
-    selectedCountryTo
-      ? groupedAirports[selectedCountryTo]?.map(airport => ({
-          value: airport.code,
-          label: `${airport.city} (${airport.code}) - ${airport.name}`
-        })) || []
-      : airports.map(airport => ({
-          value: airport.code,
-          label: `${airport.city} (${airport.code}) - ${airport.name}, ${airport.country}`
-        })),
-    [selectedCountryTo]
-  );
 
+ const [airports, setAirports] = useState<Airport[]>([]);
+const [groupedAirports, setGroupedAirports] = useState<{[key: string]: Airport[]}>({});
+const [countries, setCountries] = useState<string[]>([]);
+
+useEffect(() => {
+  const fetchAirports = async () => {
+    try {
+      const q = query(collection(db, "airports"), orderBy("country"));
+      const snapshot = await getDocs(q);
+      const fetchedAirports = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Airport[];
+      
+      setAirports(fetchedAirports);
+      
+      // Group airports by country
+      const grouped = fetchedAirports.reduce((acc, airport) => {
+        if (!acc[airport.country]) {
+          acc[airport.country] = [];
+        }
+        acc[airport.country].push(airport);
+        return acc;
+      }, {} as {[key: string]: Airport[]});
+      
+      setGroupedAirports(grouped);
+      setCountries(Object.keys(grouped).sort());
+      
+    } catch (error) {
+      console.error("Error fetching airports:", error);
+    }
+  };
+
+  fetchAirports();
+}, []);
+  
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const flights = mockFlights.filter(
@@ -67,18 +96,33 @@ const BookingPage = () => {
     setSearched(true);
   };
 
-  const handleSelectFlight = (flight: Flight) => {
-    navigate(`/book/${flight.id}`, { 
-      state: { 
-        formData: {
-          ...formData,
-          flightNumber: flight.flightNumber
-        },
-        flight
-      }
-    });
-  };
-
+  const handleSearch = async (e: React.FormEvent) => {
+  e.preventDefault();
+  
+  try {
+    // Fetch flights from Firestore instead of using mockFlights
+    const q = query(collection(db, "flights"), orderBy("scheduledDeparture"));
+    const snapshot = await getDocs(q);
+    const allFlights = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as Flight[];
+    
+    // Filter flights based on selected origin and destination
+    const flights = allFlights.filter(
+      flight => 
+        flight.origin === formData.from &&
+        flight.destination === formData.to
+    );
+    
+    setAvailableFlights(flights);
+    setSearched(true);
+  } catch (error) {
+    console.error("Error fetching flights:", error);
+    setAvailableFlights([]);
+    setSearched(true);
+  }
+};
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-center mb-8">Book a Flight</h1>
