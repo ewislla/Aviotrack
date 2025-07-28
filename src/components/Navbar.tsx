@@ -11,7 +11,7 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isHomePage, setIsHomePage] = useState(true);
   const [isAdminPage, setIsAdminPage] = useState(false);
-  
+
   const { t } = useTranslation(); // Changed this line
 
   const toggleMenu = () => {
@@ -28,7 +28,7 @@ const Navbar = () => {
   const NavLink = ({ to, icon: Icon, children, translationKey }: NavLinkProps) => {
     const isScrollLink = isHomePage && to === '#check-status';
     const linkText = translationKey ? t(translationKey) : children;
-    
+
     if (isScrollLink) {
       return (
         <motion.div
@@ -90,7 +90,7 @@ const Navbar = () => {
               </div>
             </Link>
           </motion.div>
-          
+
           {!isAdminPage && (
             <>
               <motion.div

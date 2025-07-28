@@ -9,6 +9,46 @@
     "plan": "Plan Trip",
     "contact": "Contact",
     "ctaBanner": "Plan your perfect vacation !",
-    "getStarted": "Get Started"
+    "getStarted": "Get Started",
+    "flightTracker": "Flight Tracker"
+  },
+  "flightStatus": {
+    "title": "Flight Status Results",
+    "lastUpdated": "Last updated",
+    "noFlights": "No flights found",
+    "noFlightsDesc": "No flights found matching your search criteria.",
+    "searchAgain": "Search Again",
+    "departure": "Departure",
+    "arrival": "Arrival",
+    "flightProgress": "Flight Progress",
+    "complete": "Complete",
+    "flightDuration": "Flight Duration",
+    "aircraft": "Aircraft",
+    "availableFares": "Available Fares",
+    "bookNow": "Book Now",
+    "terminal": "Terminal",
+    "gate": "Gate",
+    "scheduled": "Scheduled",
+    "actual": "Actual",
+    "economy": "Economy",
+    "business": "Business",
+    "firstClass": "First Class",
+    "flightLanded": "Flight has landed",
+    "flightCancelled": "Flight cancelled",
+    "departsIn": "Departs in",
+    "landsIn": "Lands in",
+    "shouldHaveLanded": "Flight should have landed"
+  },
+  "common": {
+    "loading": "Loading...",
+    "search": "Search",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous"
   }
 }

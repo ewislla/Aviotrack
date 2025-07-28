@@ -9,6 +9,46 @@
     "plan": "Planificar Viaje",
     "contact": "Contacto",
     "ctaBanner": "¡Planifica tus vacaciones perfectas con asistencia AI!",
-    "getStarted": "Comenzar"
+    "getStarted": "Comenzar",
+    "flightTracker": "Seguimiento de Vuelos"
+  },
+  "flightStatus": {
+    "title": "Resultados del Estado del Vuelo",
+    "lastUpdated": "Última actualización",
+    "noFlights": "No se encontraron vuelos",
+    "noFlightsDesc": "No se encontraron vuelos que coincidan con sus criterios de búsqueda.",
+    "searchAgain": "Buscar de Nuevo",
+    "departure": "Salida",
+    "arrival": "Llegada",
+    "flightProgress": "Progreso del Vuelo",
+    "complete": "Completo",
+    "flightDuration": "Duración del Vuelo",
+    "aircraft": "Aeronave",
+    "availableFares": "Tarifas Disponibles",
+    "bookNow": "Reservar Ahora",
+    "terminal": "Terminal",
+    "gate": "Puerta",
+    "scheduled": "Programado",
+    "actual": "Real",
+    "economy": "Económica",
+    "business": "Ejecutiva",
+    "firstClass": "Primera Clase",
+    "flightLanded": "El vuelo ha aterrizado",
+    "flightCancelled": "Vuelo cancelado",
+    "departsIn": "Sale en",
+    "landsIn": "Aterriza en",
+    "shouldHaveLanded": "El vuelo debería haber aterrizado"
+  },
+  "common": {
+    "loading": "Cargando...",
+    "search": "Buscar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "confirm": "Confirmar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "previous": "Anterior"
   }
 }
