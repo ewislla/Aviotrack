@@ -32,7 +32,7 @@ const BookingPage = () => {
     const fetchAirports = async () => {
       try {
         const q = query(collection(db, "airports"), orderBy("country"));
-        const snapshot = awaitDocs(q);
+        const snapshot = await getDocs(q);
         const fetchedAirports = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
