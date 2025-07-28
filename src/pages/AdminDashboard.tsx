@@ -35,6 +35,7 @@ import {
   doc,
 } from "firebase/firestore";
 import { db } from "../firebase";
+import { getAllBookings } from "../services/firebaseService";
 
 
 const AdminDashboard = () => {
@@ -71,6 +72,7 @@ const AdminDashboard = () => {
     FlightPlanRequest[]
   >([]);
   const [flights, setFlights] = useState<Flight[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
 
   useEffect(() => {
     const fetchFlights = async () => {
@@ -83,7 +85,18 @@ const AdminDashboard = () => {
       setFlights(fetchedFlights);
     };
 
+    const fetchBookings = async () => {
+      try {
+        const fetchedBookings = await getAllBookings();
+        setBookings(fetchedBookings as Booking[]);
+      } catch (error) {
+        console.error('Error fetching bookings:', error);
+        toast.error('Failed to fetch bookings');
+      }
+    };
+
     fetchFlights();
+    fetchBookings();
   }, []);
 
   
@@ -827,7 +840,7 @@ const airportOptions = airports.map((airport: Airport) => ({
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {mockBookings.map((booking) => (
+                  {bookings.map((booking) => (
                     <tr key={booking.id}>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {booking.pnr}
@@ -836,7 +849,7 @@ const airportOptions = airports.map((airport: Airport) => ({
                         {booking.fullName}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        {booking.flightNumber}
+                        {booking.flight?.flightNumber || booking.flightNumber}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {booking.passengers}

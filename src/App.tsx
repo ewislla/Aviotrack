@@ -66,6 +66,7 @@ function App() {
                 path="/booking-details/:flightId"
                 element={<BookingDetails />}
               />
+        <Route path="/booking-confirmation" element={<BookingConfirmation />} />
               <Route path="/contact" element={<ContactUs />} />
               <Route path="/travel-guide" element={<TravelGuide />} />
               <Route
