@@ -26,6 +26,7 @@ const FlightStatus = () => {
   const [flights, setFlights] = useState<Flight[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(new Date());
+  const [currentTime, setCurrentTime] = useState(new Date());
   
   const searchParams = location.state as SearchParams;
 
@@ -36,6 +37,26 @@ const FlightStatus = () => {
     }
     fetchFlights();
   }, [searchParams, navigate]);
+
+  // Update current time every second for real-time calculations
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  // Auto-refresh flight data every minute
+  useEffect(() => {
+    if (!searchParams) return;
+    
+    const refreshTimer = setInterval(() => {
+      fetchFlights();
+    }, 60000); // Refresh every minute
+
+    return () => clearInterval(refreshTimer);
+  }, [searchParams]);
 
   const fetchFlights = async () => {
     setLoading(true);
@@ -111,11 +132,20 @@ const FlightStatus = () => {
   };
 
   const calculateFlightProgress = (flight: Flight) => {
-    const now = new Date();
-    const departure = new Date(flight.scheduledDeparture);
+    const now = currentTime;
+    const departure = new Date(flight.actualDeparture || flight.scheduledDeparture);
     const arrival = new Date(flight.scheduledArrival);
     
+    // If flight is cancelled, return 0
+    if (flight.status.toLowerCase() === 'cancelled') return 0;
+    
+    // If flight has landed, return 100
+    if (flight.status.toLowerCase() === 'landed') return 100;
+    
+    // If flight hasn't departed yet
     if (now < departure) return 0;
+    
+    // If flight should have arrived
     if (now > arrival) return 100;
     
     const totalDuration = arrival.getTime() - departure.getTime();
@@ -124,33 +154,50 @@ const FlightStatus = () => {
   };
 
   const getTimeRemaining = (flight: Flight) => {
-    const now = new Date();
-    const departure = new Date(flight.scheduledDeparture);
+    const now = currentTime;
+    const departure = new Date(flight.actualDeparture || flight.scheduledDeparture);
     const arrival = new Date(flight.scheduledArrival);
     
     if (flight.status.toLowerCase() === 'cancelled') {
-      return t('flightStatus.flightCancelled');
+      return t('flightStatus.flightCancelled') || 'Flight Cancelled';
     }
     
     if (flight.status.toLowerCase() === 'landed') {
-      return t('flightStatus.flightLanded');
+      return t('flightStatus.flightLanded') || 'Flight Landed';
     }
     
+    // Flight hasn't departed yet
     if (now < departure) {
       const timeToDeparture = departure.getTime() - now.getTime();
       const hours = Math.floor(timeToDeparture / (1000 * 60 * 60));
       const minutes = Math.floor((timeToDeparture % (1000 * 60 * 60)) / (1000 * 60));
-      return `${t('flightStatus.departsIn')} ${hours}h ${minutes}m`;
+      
+      if (hours <= 0 && minutes <= 0) {
+        return 'Departing Now';
+      }
+      
+      return `${t('flightStatus.departsIn') || 'Departs in'} ${hours}h ${minutes}m`;
     }
     
+    // Flight is in progress
     if (now >= departure && now < arrival) {
       const timeToArrival = arrival.getTime() - now.getTime();
       const hours = Math.floor(timeToArrival / (1000 * 60 * 60));
       const minutes = Math.floor((timeToArrival % (1000 * 60 * 60)) / (1000 * 60));
-      return `${t('flightStatus.landsIn')} ${hours}h ${minutes}m`;
+      
+      if (hours <= 0 && minutes <= 0) {
+        return 'Landing Now';
+      }
+      
+      return `${t('flightStatus.landsIn') || 'Lands in'} ${hours}h ${minutes}m`;
     }
     
-    return t('flightStatus.shouldHaveLanded');
+    // Flight should have landed
+    const timeSinceLanding = now.getTime() - arrival.getTime();
+    const hoursSince = Math.floor(timeSinceLanding / (1000 * 60 * 60));
+    const minutesSince = Math.floor((timeSinceLanding % (1000 * 60 * 60)) / (1000 * 60));
+    
+    return `Landed ${hoursSince}h ${minutesSince}m ago`;
   };
 
   const formatDuration = (departure: string, arrival: string) => {
@@ -197,13 +244,18 @@ const FlightStatus = () => {
             <h1 className="text-3xl font-bold text-gray-900">
               {t('flightStatus.title')}
             </h1>
-            <button
-              onClick={fetchFlights}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <RefreshCw className="h-4 w-4" />
-              <span>Refresh</span>
-            </button>
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={fetchFlights}
+                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <RefreshCw className="h-4 w-4" />
+                <span>Refresh</span>
+              </button>
+              <div className="text-sm text-gray-500">
+                Auto-updating every minute
+              </div>
+            </div>
           </div>
           
           <div className="flex items-center text-sm text-gray-500">
@@ -328,15 +380,21 @@ const FlightStatus = () => {
                             <p className="text-sm text-gray-600 mb-1">{t('flightStatus.estimatedTimeRemaining')}</p>
                             <p className="font-semibold text-gray-900">{getTimeRemaining(flight)}</p>
                           </div>
-                          {flight.status.toLowerCase() === 'in flight' && (
+                          {(flight.status.toLowerCase() === 'in flight' || 
+                           (calculateFlightProgress(flight) > 0 && calculateFlightProgress(flight) < 100 && 
+                            flight.status.toLowerCase() !== 'cancelled' && flight.status.toLowerCase() !== 'landed')) && (
                             <div className="space-y-2 text-sm">
                               <div className="flex justify-between">
-                                <span className="text-gray-600">{t('flightStatus.altitude')}:</span>
+                                <span className="text-gray-600">{t('flightStatus.altitude') || 'Altitude'}:</span>
                                 <span className="font-medium">35,000 ft</span>
                               </div>
                               <div className="flex justify-between">
-                                <span className="text-gray-600">{t('flightStatus.speed')}:</span>
+                                <span className="text-gray-600">{t('flightStatus.speed') || 'Speed'}:</span>
                                 <span className="font-medium">550 mph</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-gray-600">Progress:</span>
+                                <span className="font-medium">{Math.round(calculateFlightProgress(flight))}%</span>
                               </div>
                             </div>
                           )}

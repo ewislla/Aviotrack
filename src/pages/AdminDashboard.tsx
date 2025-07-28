@@ -168,15 +168,25 @@ const airportOptions = airports.map((airport: Airport) => ({
     setEditedFlightData(flight);
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (editedFlightData) {
-      const flightIndex = flights.findIndex(
-        (f) => f.id === editedFlightData.id,
-      );
-      if (flightIndex !== -1) {
-        flights[flightIndex] = editedFlightData;
-        saveFlights(flights);
+      try {
+        // Update in Firestore
+        await updateDoc(doc(db, "flights", editedFlightData.id), {
+          flightNumber: editedFlightData.flightNumber,
+          status: editedFlightData.status,
+          updatedAt: new Date().toISOString()
+        });
+
+        // Update local state
+        setFlights(flights.map(flight => 
+          flight.id === editedFlightData.id ? editedFlightData : flight
+        ));
+        
         toast.success("Flight updated successfully");
+      } catch (error) {
+        console.error('Error updating flight:', error);
+        toast.error('Failed to update flight');
       }
       setEditingFlight(null);
       setEditedFlightData(null);
@@ -261,24 +271,32 @@ const airportOptions = airports.map((airport: Airport) => ({
       ),
     };
 
-    await addDoc(collection(db, "flights"), flight);
-    toast.success("Flight added to Firestore");
-    setShowAddFlight(false);
-    setNewFlight({
-      airline: "",
-      flightNumber: "",
-      origin: "",
-      destination: "",
-      scheduledDeparture: "",
-      scheduledArrival: "",
-      terminal: "",
-      gate: "",
-      aircraftType: "",
-      economyPrice: 0,
-      businessPrice: 0,
-      firstClassPrice: 0,
-    });
-    toast.success("Flight added successfully");
+    try {
+      const docRef = await addDoc(collection(db, "flights"), flight);
+      // Refresh the flights list
+      const updatedFlights = [...flights, { ...flight, id: docRef.id }];
+      setFlights(updatedFlights);
+      
+      setShowAddFlight(false);
+      setNewFlight({
+        airline: "",
+        flightNumber: "",
+        origin: "",
+        destination: "",
+        scheduledDeparture: "",
+        scheduledArrival: "",
+        terminal: "",
+        gate: "",
+        aircraftType: "",
+        economyPrice: 0,
+        businessPrice: 0,
+        firstClassPrice: 0,
+      });
+      toast.success("Flight added successfully");
+    } catch (error) {
+      console.error('Error adding flight:', error);
+      toast.error("Failed to add flight");
+    }
   };
 
   const openPriceModal = (flight: Flight) => {
