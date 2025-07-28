@@ -63,6 +63,8 @@ function App() {
                 <Route path="/contact" element={<ContactUs />} />
                 <Route path="/travel-guide" element={<TravelGuide />} />
                 <Route path="/vacation-counselor" element={<VacationCounselor />} />
+                <Route path="/booking-details/:flightId" element={<BookingDetails />} />
+<Route path="/confirmation/:bookingId" element={<BookingConfirmation />} />
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="/admin/dashboard" element={
                   <ProtectedRoute>

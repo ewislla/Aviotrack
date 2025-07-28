@@ -82,23 +82,19 @@ const BookingDetails = () => {
 
   try {
     // Save to Firebase
-    await addDoc(collection(db, 'bookings'), booking);
+    const docRef = await addDoc(collection(db, 'bookings'), booking);
+    console.log('Booking saved with ID:', docRef.id);
     
-    // Update seat status
+    // Update seat status in your local state/mock data
     updateSeatStatus(flight.id, selectedSeats, 'Booked');
     
-    // Also save to localStorage for offline functionality
-    mockBookings.push(booking);
-    saveBookings(mockBookings);
-    
     toast.success('Booking confirmed!');
-    navigate(`/confirmation/${booking.id}`, { state: { booking } });
+    navigate('/confirmation', { state: { booking } });
   } catch (error) {
     console.error('Error saving booking:', error);
     toast.error('Booking failed. Please try again.');
   }
 };
-
   const renderSeatMap = () => {
     if (!flight) return null;
 
