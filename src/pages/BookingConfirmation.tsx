@@ -17,15 +17,24 @@ const BookingConfirmation = () => {
  useEffect(() => {
   if (!location.state?.booking) {
     navigate('/book'); // or wherever your main booking page is
-    return
+    return;
+  }
 
-    const bookingData = location.state.booking;
-    setBooking(bookingData);
-    generateQRCode(bookingData.pnr);
+  const bookingData = location.state.booking;
+  setBooking(bookingData);
+  generateQRCode(bookingData.pnr);
 
-    // Save booking to Firebase
-    
-  }, [location.state, navigate]);
+  // Save booking to Firebase
+  const saveBooking = async () => {
+    try {
+      await addBooking(bookingData);
+    } catch (error) {
+      console.error('Error saving booking:', error);
+    }
+  };
+  
+  saveBooking();
+}, [location.state, navigate]);
 
 
 
