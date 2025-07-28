@@ -23,14 +23,21 @@ const BookingDetails = () => {
   });
 
   useEffect(() => {
-    const selectedFlight = mockFlights.find(f => f.id === flightId);
-    if (!selectedFlight) {
-      toast.error('Flight not found');
-      navigate('/book');
-      return;
-    }
-    setFlight(selectedFlight);
-  }, [flightId, navigate]);
+  // First try to get flight from location state (more reliable)
+  if (location.state?.flight) {
+    setFlight(location.state.flight);
+    return;
+  }
+  
+  // Fallback to finding by ID in mockFlights
+  const selectedFlight = mockFlights.find(f => f.id === flightId);
+  if (!selectedFlight) {
+    toast.error('Flight not found');
+    navigate('/book');
+    return;
+  }
+  setFlight(selectedFlight);
+}, [flightId, navigate, location.state]);
 
   const calculatePrice = () => {
     if (!flight || selectedSeats.length === 0) return 0;
