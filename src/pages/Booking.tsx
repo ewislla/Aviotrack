@@ -32,14 +32,14 @@ const BookingPage = () => {
     const fetchAirports = async () => {
       try {
         const q = query(collection(db, "airports"), orderBy("country"));
-        const snapshot = await getDocs(q);
+        const snapshot = awaitDocs(q);
         const fetchedAirports = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         })) as Airport[];
-        
+
         setAirports(fetchedAirports);
-        
+
         // Group airports by country
         const grouped = fetchedAirports.reduce((acc, airport) => {
           if (!acc[airport.country]) {
@@ -48,10 +48,10 @@ const BookingPage = () => {
           acc[airport.country].push(airport);
           return acc;
         }, {} as {[key: string]: Airport[]});
-        
+
         setGroupedAirports(grouped);
         setCountries(Object.keys(grouped).sort());
-        
+
       } catch (error) {
         console.error("Error fetching airports:", error);
       }
@@ -96,7 +96,7 @@ const BookingPage = () => {
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       // Fetch flights from Firestore instead of using mockFlights
       const q = query(collection(db, "flights"), orderBy("scheduledDeparture"));
@@ -105,14 +105,14 @@ const BookingPage = () => {
         id: doc.id,
         ...doc.data(),
       })) as Flight[];
-      
+
       // Filter flights based on selected origin and destination
       const flights = allFlights.filter(
         flight => 
           flight.origin === formData.from &&
           flight.destination === formData.to
       );
-      
+
       setAvailableFlights(flights);
       setSearched(true);
     } catch (error) {
@@ -122,14 +122,11 @@ const BookingPage = () => {
     }
   };
 
-
-const navigate = useNavigate();
-
-const handleFlightSelect = (selectedFlight, formData) => {
-  navigate(`/booking-details/${selectedFlight.id}`, {
-    state: { formData }
-  });
-};
+const handleSelectFlight = (flight: Flight) => {
+    navigate(`/booking-details/${flight.id}`, {
+      state: { formData, flight }
+    });
+  };
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-center mb-8">Book a Flight</h1>
