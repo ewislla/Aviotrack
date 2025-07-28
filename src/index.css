@@ -2,7 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-scroll-behavior: smooth;
+* {
+  scroll-behavior: smooth;
 }
 
 /* Flight Tracker Styles */
