@@ -1,20 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { Users, Calendar, MapPin, DollarSign, Plane } from 'lucide-react';
+import { Users, CreditCard, Mail, User, Check, Plane } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { Flight, Seat } from '../types';
+import { Flight, Seat, Booking } from '../types';
 import { mockFlights, updateSeatStatus } from '../data';
-import { addBooking } from '../services/firebaseService';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../firebase';
-import { Plane, Users, CreditCard, Mail, User, Check } from 'lucide-react';
-import { toast } from 'react-hot-toast';
-import { mockFlights, mockBookings, saveBookings, updateSeatStatus } from '../data';
-import { Flight, Booking, Seat } from '../types';
 import { generatePNR } from '../utils/generatePNR';
 import { collection, addDoc } from 'firebase/firestore';
-import { db } from '../firebase'; // adjust the path
-
+import { db } from '../firebase';
 
 const BookingDetails = () => {
   const { flightId } = useParams();
@@ -22,6 +14,7 @@ const BookingDetails = () => {
   const location = useLocation();
   const [flight, setFlight] = useState<Flight | null>(null);
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     fullName: location.state?.formData?.fullName || '',
     email: location.state?.formData?.email || '',
@@ -30,21 +23,44 @@ const BookingDetails = () => {
   });
 
   useEffect(() => {
-  // First try to get flight from location state (more reliable)
-  if (location.state?.flight) {
-    setFlight(location.state.flight);
-    return;
-  }
+    const loadFlight = () => {
+      try {
+        // First try to get flight from location state (more reliable)
+        if (location.state?.flight) {
+          console.log('Flight loaded from location state:', location.state.flight);
+          setFlight(location.state.flight);
+          setLoading(false);
+          return;
+        }
 
-  // Fallback to finding by ID in mockFlights
-  const selectedFlight = mockFlights.find(f => f.id === flightId);
-  if (!selectedFlight) {
-    toast.error('Flight not found');
-    navigate('/book');
-    return;
-  }
-  setFlight(selectedFlight);
-}, [flightId, navigate, location.state]);
+        // Fallback to finding by ID in mockFlights
+        if (!flightId) {
+          toast.error('No flight ID provided');
+          navigate('/book');
+          return;
+        }
+
+        const selectedFlight = mockFlights.find(f => f.id === flightId);
+        if (!selectedFlight) {
+          console.error('Flight not found with ID:', flightId);
+          toast.error('Flight not found');
+          navigate('/book');
+          return;
+        }
+        
+        console.log('Flight loaded from mockFlights:', selectedFlight);
+        setFlight(selectedFlight);
+      } catch (error) {
+        console.error('Error loading flight:', error);
+        toast.error('Error loading flight details');
+        navigate('/book');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadFlight();
+  }, [flightId, navigate, location.state]);
 
   const calculatePrice = () => {
     if (!flight || selectedSeats.length === 0) return 0;
@@ -63,54 +79,74 @@ const BookingDetails = () => {
 
   const handleSeatSelection = (seatNumber: string) => {
     if (selectedSeats.includes(seatNumber)) {
-      setSelectedSeats(selectedSeats.filter(s => s !== seatNumber));
+      setSelectedSeats(prev => prev.filter(s => s !== seatNumber));
     } else if (selectedSeats.length < formData.passengers) {
-      setSelectedSeats([...selectedSeats, seatNumber]);
+      setSelectedSeats(prev => [...prev, seatNumber]);
     } else {
-      toast.error(`You can only select ${formData.passengers} seats`);
+      toast.error(`You can only select ${formData.passengers} seat${formData.passengers > 1 ? 's' : ''}`);
     }
   };
 
- const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!flight) return;
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!flight) {
+      toast.error('Flight information not available');
+      return;
+    }
 
-  if (selectedSeats.length !== formData.passengers) {
-    toast.error(`Please select ${formData.passengers} seats`);
-    return;
-  }
+    if (selectedSeats.length !== formData.passengers) {
+      toast.error(`Please select exactly ${formData.passengers} seat${formData.passengers > 1 ? 's' : ''}`);
+      return;
+    }
 
-  const booking: Booking = {
-    id: Math.random().toString(36).substr(2, 9),
-    pnr: generatePNR(),
-    fullName: formData.fullName,
-    email: formData.email,
-    flightNumber: flight.flightNumber,
-    passengers: formData.passengers,
-    timestamp: new Date().toISOString(),
-    seatClass: formData.seatClass,
-    seatNumbers: selectedSeats,
-    price: calculatePrice(),
-    flight: flight
+    // Validation
+    if (!formData.fullName.trim()) {
+      toast.error('Please enter your full name');
+      return;
+    }
+
+    if (!formData.email.trim()) {
+      toast.error('Please enter your email');
+      return;
+    }
+
+    const booking: Booking = {
+      id: Math.random().toString(36).substr(2, 9),
+      pnr: generatePNR(),
+      fullName: formData.fullName.trim(),
+      email: formData.email.trim(),
+      flightNumber: flight.flightNumber,
+      passengers: formData.passengers,
+      timestamp: new Date().toISOString(),
+      seatClass: formData.seatClass,
+      seatNumbers: selectedSeats,
+      price: calculatePrice(),
+      flight: flight
+    };
+
+    try {
+      console.log('Attempting to save booking:', booking);
+      
+      // Save to Firebase
+      const docRef = await addDoc(collection(db, 'bookings'), booking);
+      console.log('Booking saved with ID:', docRef.id);
+
+      // Update seat status in your local state/mock data
+      updateSeatStatus(flight.id, selectedSeats, 'Booked');
+
+      toast.success('Booking confirmed successfully!');
+      navigate('/booking-confirmation', { state: { booking } });
+    } catch (error) {
+      console.error('Error saving booking:', error);
+      toast.error('Booking failed. Please try again.');
+    }
   };
 
-  try {
-    // Save to Firebase
-    const docRef = await addDoc(collection(db, 'bookings'), booking);
-    console.log('Booking saved with ID:', docRef.id);
-
-    // Update seat status in your local state/mock data
-    updateSeatStatus(flight.id, selectedSeats, 'Booked');
-
-    toast.success('Booking confirmed!');
-    navigate('/booking-confirmation', { state: { booking } });
-  } catch (error) {
-    console.error('Error saving booking:', error);
-    toast.error('Booking failed. Please try again.');
-  }
-};
   const renderSeatMap = () => {
-    if (!flight) return null;
+    if (!flight || !flight.seats) {
+      console.warn('No flight or seats data available for seat map');
+      return <div className="text-center text-gray-500 py-4">No seats available</div>;
+    }
 
     const seatsByClass = {
       'First Class': flight.seats.filter(seat => seat.class === 'First Class'),
@@ -121,46 +157,79 @@ const BookingDetails = () => {
     return (
       <div className="mt-8">
         <h3 className="text-lg font-semibold mb-4">Select Your Seats</h3>
-        {Object.entries(seatsByClass).map(([className, seats]) => (
-          <div key={className} className="mb-8">
-            <h4 className="text-md font-medium mb-2">{className}</h4>
-            <div className="grid grid-cols-6 gap-2">
-              {seats.map((seat) => (
-                <button
-                  key={seat.number}
-                  onClick={() => handleSeatSelection(seat.number)}
-                  disabled={seat.status === 'Booked' || 
-                           (formData.seatClass !== seat.class) ||
-                           (selectedSeats.length >= formData.passengers && !selectedSeats.includes(seat.number))}
-                  className={`p-2 rounded-md text-sm font-medium transition-colors
-                    ${seat.status === 'Booked' 
-                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                      : selectedSeats.includes(seat.number)
-                      ? 'bg-blue-600 text-white'
-                      : formData.seatClass === seat.class
-                      ? 'bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50'
-                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    }`}
-                >
-                  {seat.number}
-                  {selectedSeats.includes(seat.number) && (
-                    <Check className="h-4 w-4 inline-block ml-1" />
-                  )}
-                </button>
-              ))}
+        <div className="mb-4 text-sm text-gray-600">
+          You need to select {formData.passengers} seat{formData.passengers > 1 ? 's' : ''} in {formData.seatClass} class
+        </div>
+        
+        {Object.entries(seatsByClass).map(([className, seats]) => {
+          if (seats.length === 0) return null;
+          
+          return (
+            <div key={className} className="mb-8">
+              <h4 className="text-md font-medium mb-2 flex items-center">
+                {className} 
+                <span className="ml-2 text-sm text-gray-500">({seats.filter(s => s.status === 'Available').length} available)</span>
+              </h4>
+              <div className="grid grid-cols-6 gap-2">
+                {seats.map((seat) => {
+                  const isDisabled = seat.status === 'Booked' || 
+                                   (formData.seatClass !== seat.class) ||
+                                   (selectedSeats.length >= formData.passengers && !selectedSeats.includes(seat.number));
+                  
+                  return (
+                    <button
+                      key={seat.number}
+                      type="button"
+                      onClick={() => handleSeatSelection(seat.number)}
+                      disabled={isDisabled}
+                      className={`p-2 rounded-md text-sm font-medium transition-colors relative
+                        ${seat.status === 'Booked' 
+                          ? 'bg-red-200 text-red-700 cursor-not-allowed'
+                          : selectedSeats.includes(seat.number)
+                          ? 'bg-blue-600 text-white'
+                          : formData.seatClass === seat.class
+                          ? 'bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-50'
+                          : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        }`}
+                      title={`${seat.number} - $${seat.price} - ${seat.status}`}
+                    >
+                      {seat.number}
+                      {selectedSeats.includes(seat.number) && (
+                        <Check className="h-3 w-3 absolute top-0 right-0" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     );
   };
 
-  if (!flight) {
+  if (loading) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading flight details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!flight) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="text-center">
+          <p className="text-red-600">Flight not found</p>
+          <button 
+            onClick={() => navigate('/book')}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Back to Search
+          </button>
         </div>
       </div>
     );
@@ -187,6 +256,9 @@ const BookingDetails = () => {
               </p>
             </div>
           </div>
+          <div className="mt-4">
+            <p className="text-blue-100">Flight: <span className="font-semibold">{flight.flightNumber}</span></p>
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
@@ -195,7 +267,7 @@ const BookingDetails = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <div className="flex items-center space-x-2">
                   <User className="h-5 w-5 text-gray-400" />
-                  <span>Full Name</span>
+                  <span>Full Name *</span>
                 </div>
               </label>
               <input
@@ -203,7 +275,8 @@ const BookingDetails = () => {
                 required
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 value={formData.fullName}
-                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
+                placeholder="Enter your full name"
               />
             </div>
 
@@ -211,7 +284,7 @@ const BookingDetails = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 <div className="flex items-center space-x-2">
                   <Mail className="h-5 w-5 text-gray-400" />
-                  <span>Email</span>
+                  <span>Email *</span>
                 </div>
               </label>
               <input
@@ -219,7 +292,8 @@ const BookingDetails = () => {
                 required
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                placeholder="Enter your email"
               />
             </div>
           </div>
@@ -240,9 +314,9 @@ const BookingDetails = () => {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 value={formData.passengers}
                 onChange={(e) => {
-                  const newPassengers = parseInt(e.target.value);
-                  setFormData({ ...formData, passengers: newPassengers });
-                  setSelectedSeats([]);
+                  const newPassengers = parseInt(e.target.value) || 1;
+                  setFormData(prev => ({ ...prev, passengers: newPassengers }));
+                  setSelectedSeats([]); // Clear seat selection when passenger count changes
                 }}
               />
             </div>
@@ -267,30 +341,39 @@ const BookingDetails = () => {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-gray-600">Selected Seats</span>
-                <span>{selectedSeats.join(', ') || 'None selected'}</span>
+                <span>{selectedSeats.length > 0 ? selectedSeats.join(', ') : 'None selected'}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Price per Seat</span>
-                <span>${calculatePrice() / (selectedSeats.length || 1)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Number of Seats</span>
-                <span>{selectedSeats.length}</span>
-              </div>
+              {selectedSeats.length > 0 && (
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Price per Seat</span>
+                    <span>${(calculatePrice() / selectedSeats.length).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Number of Seats</span>
+                    <span>{selectedSeats.length}</span>
+                  </div>
+                </>
+              )}
               <div className="flex justify-between font-semibold text-lg pt-2 border-t">
                 <span>Total</span>
-                <span>${calculatePrice()}</span>
+                <span>${calculatePrice().toFixed(2)}</span>
               </div>
             </div>
           </div>
 
           <button
             type="submit"
-            disabled={selectedSeats.length !== formData.passengers}
-            className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+            disabled={selectedSeats.length !== formData.passengers || !formData.fullName.trim() || !formData.email.trim()}
+            className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center space-x-2 transition-colors"
           >
             <CreditCard className="h-5 w-5" />
-            <span>Confirm Booking</span>
+            <span>
+              {selectedSeats.length !== formData.passengers 
+                ? `Select ${formData.passengers - selectedSeats.length} more seat${formData.passengers - selectedSeats.length > 1 ? 's' : ''}` 
+                : 'Confirm Booking'
+              }
+            </span>
           </button>
         </form>
       </div>
