@@ -1,0 +1,158 @@
+
+src/pages/Booking.tsx:107:18 - error TS2339: Property 'state' does not exist on type 'Location'.
+
+107     if (location.state?.preselectedFlight) {
+                     ~~~~~
+
+src/pages/Booking.tsx:108:42 - error TS2339: Property 'state' does not exist on type 'Location'.
+
+108       const preselectedFlight = location.state.preselectedFlight;
+                                             ~~~~~
+
+src/pages/Booking.tsx:113:20 - error TS2339: Property 'state' does not exist on type 'Location'.
+
+113       if (location.state.origin && location.state.destination) {
+                       ~~~~~
+
+src/pages/Booking.tsx:113:45 - error TS2339: Property 'state' does not exist on type 'Location'.
+
+113       if (location.state.origin && location.state.destination) {
+                                                ~~~~~
+
+src/pages/Booking.tsx:116:26 - error TS2339: Property 'state' does not exist on type 'Location'.
+
+116           from: location.state.origin,
+                             ~~~~~
+
+src/pages/Booking.tsx:117:24 - error TS2339: Property 'state' does not exist on type 'Location'.
+
+117           to: location.state.destination
+                           ~~~~~
+
+src/pages/Booking.tsx:121:16 - error TS2339: Property 'state' does not exist on type 'Location'.
+
+121   }, [location.state]);
+                   ~~~~~
+
+src/pages/Booking.tsx:150:36 - error TS7006: Parameter 'flight' implicitly has an 'any' type.
+
+150   const checkFlightAvailability = (flight, requestedClass, passengers) => {
+                                       ~~~~~~
+
+src/pages/Booking.tsx:150:44 - error TS7006: Parameter 'requestedClass' implicitly has an 'any' type.
+
+150   const checkFlightAvailability = (flight, requestedClass, passengers) => {
+                                               ~~~~~~~~~~~~~~
+
+src/pages/Booking.tsx:150:60 - error TS7006: Parameter 'passengers' implicitly has an 'any' type.
+
+150   const checkFlightAvailability = (flight, requestedClass, passengers) => {
+                                                               ~~~~~~~~~~
+
+src/pages/Booking.tsx:152:5 - error TS7006: Parameter 'seat' implicitly has an 'any' type.
+
+152     seat => seat.class === requestedClass && seat.status === 'Available'
+        ~~~~
+
+src/pages/Booking.tsx:159:29 - error TS7006: Parameter 'selectedFlight' implicitly has an 'any' type.
+
+159 const handleFlightSelect = (selectedFlight, currentFormData) => {
+                                ~~~~~~~~~~~~~~
+
+src/pages/Booking.tsx:159:45 - error TS7006: Parameter 'currentFormData' implicitly has an 'any' type.
+
+159 const handleFlightSelect = (selectedFlight, currentFormData) => {
+                                                ~~~~~~~~~~~~~~~
+
+src/pages/BookingConfirmation.tsx:75:63 - error TS2339: Property 'email' does not exist on type 'never'.
+
+75           toast.success(`Confirmation email sent to ${booking.email}`);
+                                                                 ~~~~~
+
+src/pages/BookingConfirmation.tsx:104:64 - error TS2339: Property 'pnr' does not exist on type 'never'.
+
+104             <span className="text-blue-600 font-mono">{booking.pnr}</span>
+                                                                   ~~~
+
+src/pages/BookingConfirmation.tsx:111:55 - error TS2339: Property 'flight' does not exist on type 'never'.
+
+111                 <p className="font-semibold">{booking.flight.origin}</p>
+                                                          ~~~~~~
+
+src/pages/BookingConfirmation.tsx:113:37 - error TS2339: Property 'flight' does not exist on type 'never'.
+
+113                   {new Date(booking.flight.scheduledDeparture).toLocaleString()}
+                                        ~~~~~~
+
+src/pages/BookingConfirmation.tsx:118:55 - error TS2339: Property 'flight' does not exist on type 'never'.
+
+118                 <p className="font-semibold">{booking.flight.destination}</p>
+                                                          ~~~~~~
+
+src/pages/BookingConfirmation.tsx:120:37 - error TS2339: Property 'flight' does not exist on type 'never'.
+
+120                   {new Date(booking.flight.scheduledArrival).toLocaleString()}
+                                        ~~~~~~
+
+src/pages/BookingConfirmation.tsx:127:72 - error TS2339: Property 'fullName' does not exist on type 'never'.
+
+127               <p><span className="text-gray-600">Name:</span> {booking.fullName}</p>
+                                                                           ~~~~~~~~
+
+src/pages/BookingConfirmation.tsx:128:73 - error TS2339: Property 'email' does not exist on type 'never'.
+
+128               <p><span className="text-gray-600">Email:</span> {booking.email}</p>
+                                                                            ~~~~~
+
+src/pages/BookingConfirmation.tsx:129:73 - error TS2339: Property 'seatClass' does not exist on type 'never'.
+
+129               <p><span className="text-gray-600">Class:</span> {booking.seatClass}</p>
+                                                                            ~~~~~~~~~
+
+src/pages/BookingConfirmation.tsx:130:80 - error TS2339: Property 'seatNumbers' does not exist on type 'never'.
+
+130               <p><span className="text-gray-600">Seat Numbers:</span> {booking.seatNumbers.join(', ')}</p>
+                                                                                   ~~~~~~~~~~~
+
+src/pages/BookingConfirmation.tsx:131:78 - error TS2339: Property 'passengers' does not exist on type 'never'.
+
+131               <p><span className="text-gray-600">Passengers:</span> {booking.passengers}</p>
+                                                                                 ~~~~~~~~~~
+
+src/pages/BookingConfirmation.tsx:136:75 - error TS2339: Property 'flight' does not exist on type 'never'.
+
+136               <p><span className="text-gray-600">Airline:</span> {booking.flight.airline}</p>
+                                                                              ~~~~~~
+
+src/pages/BookingConfirmation.tsx:137:74 - error TS2339: Property 'flight' does not exist on type 'never'.
+
+137               <p><span className="text-gray-600">Flight:</span> {booking.flight.flightNumber}</p>
+                                                                             ~~~~~~
+
+src/pages/BookingConfirmation.tsx:138:76 - error TS2339: Property 'flight' does not exist on type 'never'.
+
+138               <p><span className="text-gray-600">Aircraft:</span> {booking.flight.aircraftType}</p>
+                                                                               ~~~~~~
+
+src/pages/BookingConfirmation.tsx:139:76 - error TS2339: Property 'flight' does not exist on type 'never'.
+
+139               <p><span className="text-gray-600">Terminal:</span> {booking.flight.terminal}</p>
+                                                                               ~~~~~~
+
+src/pages/BookingConfirmation.tsx:140:72 - error TS2339: Property 'flight' does not exist on type 'never'.
+
+140               <p><span className="text-gray-600">Gate:</span> {booking.flight.gate}</p>
+                                                                           ~~~~~~
+
+src/pages/BookingConfirmation.tsx:146:63 - error TS2339: Property 'price' does not exist on type 'never'.
+
+146                 <span className="text-xl font-bold">${booking.price}</span>
+                                                                  ~~~~~
+
+
+Found 30 errors in 2 files.
+
+Errors  Files
+    13  src/pages/Booking.tsx:107
+    17  src/pages/BookingConfirmation.tsx:75
+~/workspace$ 
