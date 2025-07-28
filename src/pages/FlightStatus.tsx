@@ -430,8 +430,11 @@ const FlightStatus = () => {
                       </div>
                     </div>
 
-                    {/* Available Fares */}
-                    {flight.economyPrice && (
+                    {/* Available Fares - Only show for bookable flights */}
+                    {flight.economyPrice && 
+                     (flight.status.toLowerCase() === 'on time' || 
+                      flight.status.toLowerCase() === 'delayed' || 
+                      flight.status.toLowerCase() === 'boarding') && (
                       <div className="border-t pt-6">
                         <h3 className="font-semibold text-gray-900 mb-4">{t('flightStatus.availableFares')}</h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -450,11 +453,32 @@ const FlightStatus = () => {
                         </div>
                         <div className="mt-4 text-center">
                           <button
-                            onClick={() => navigate(`/booking-details/${flight.id}`)}
+                            onClick={() => navigate('/book', { 
+                              state: { 
+                                preselectedFlight: flight,
+                                origin: flight.origin,
+                                destination: flight.destination
+                              }
+                            })}
                             className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
                           >
                             {t('flightStatus.bookNow')}
                           </button>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Message for non-bookable flights */}
+                    {(flight.status.toLowerCase() === 'landed' || 
+                      flight.status.toLowerCase() === 'cancelled' ||
+                      flight.status.toLowerCase() === 'in flight') && (
+                      <div className="border-t pt-6">
+                        <div className="bg-gray-100 p-4 rounded-lg text-center">
+                          <p className="text-gray-700">
+                            {flight.status.toLowerCase() === 'landed' && 'This flight has already landed and is no longer available for booking.'}
+                            {flight.status.toLowerCase() === 'cancelled' && 'This flight has been cancelled and is not available for booking.'}
+                            {flight.status.toLowerCase() === 'in flight' && 'This flight is currently in progress and no longer available for booking.'}
+                          </p>
                         </div>
                       </div>
                     )}

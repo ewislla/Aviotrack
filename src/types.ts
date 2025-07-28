@@ -48,7 +48,7 @@ export interface Flight {
   actualArrival: string;
   terminal: string;
   gate: string;
-  status: 'On Time' | 'Delayed' | 'Cancelled' | 'Landed';
+  status: 'On Time' | 'Delayed' | 'Cancelled' | 'Landed' | 'In Flight' | 'Boarding';
   aircraftType: string;
   economyPrice: number;
   businessPrice: number;

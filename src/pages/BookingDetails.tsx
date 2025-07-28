@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { Users, Calendar, MapPin, DollarSign, Plane } from 'lucide-react';
+import { toast } from 'react-hot-toast';
+import { Flight, Seat } from '../types';
+import { mockFlights, updateSeatStatus } from '../data';
+import { addBooking } from '../services/firebaseService';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../firebase';
 import { Plane, Users, CreditCard, Mail, User, Check } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { mockFlights, mockBookings, saveBookings, updateSeatStatus } from '../data';
@@ -28,7 +35,7 @@ const BookingDetails = () => {
     setFlight(location.state.flight);
     return;
   }
-  
+
   // Fallback to finding by ID in mockFlights
   const selectedFlight = mockFlights.find(f => f.id === flightId);
   if (!selectedFlight) {
@@ -91,10 +98,10 @@ const BookingDetails = () => {
     // Save to Firebase
     const docRef = await addDoc(collection(db, 'bookings'), booking);
     console.log('Booking saved with ID:', docRef.id);
-    
+
     // Update seat status in your local state/mock data
     updateSeatStatus(flight.id, selectedSeats, 'Booked');
-    
+
     toast.success('Booking confirmed!');
     navigate('/booking-confirmation', { state: { booking } });
   } catch (error) {

@@ -5,6 +5,7 @@ import Select from "react-select";
 import { mockFlights } from "../data";
 import { Flight } from "../types";
 import { Airport } from "../types"; // Add Airport type import
+import { toast } from "react-hot-toast";
 
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { db } from "../firebase";
@@ -100,6 +101,24 @@ const BookingPage = () => {
           })),
     [selectedCountryTo, groupedAirports, airports],
   );
+
+  useEffect(() => {
+    // Check if there's a preselected flight from flight status page
+    if (location.state?.preselectedFlight) {
+      const preselectedFlight = location.state.preselectedFlight;
+      setAvailableFlights([preselectedFlight]);
+      setSearched(true);
+      
+      // Pre-fill form data if provided
+      if (location.state.origin && location.state.destination) {
+        setFormData(prev => ({
+          ...prev,
+          from: location.state.origin,
+          to: location.state.destination
+        }));
+      }
+    }
+  }, [location.state]);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();

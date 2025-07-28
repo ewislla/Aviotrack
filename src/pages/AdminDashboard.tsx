@@ -171,10 +171,24 @@ const airportOptions = airports.map((airport: Airport) => ({
   const handleSaveEdit = async () => {
     if (editedFlightData) {
       try {
-        // Update in Firestore
+        // Update in Firestore with all flight data
         await updateDoc(doc(db, "flights", editedFlightData.id), {
           flightNumber: editedFlightData.flightNumber,
           status: editedFlightData.status,
+          airline: editedFlightData.airline,
+          origin: editedFlightData.origin,
+          destination: editedFlightData.destination,
+          scheduledDeparture: editedFlightData.scheduledDeparture,
+          scheduledArrival: editedFlightData.scheduledArrival,
+          actualDeparture: editedFlightData.actualDeparture,
+          actualArrival: editedFlightData.actualArrival,
+          terminal: editedFlightData.terminal,
+          gate: editedFlightData.gate,
+          aircraftType: editedFlightData.aircraftType,
+          economyPrice: editedFlightData.economyPrice,
+          businessPrice: editedFlightData.businessPrice,
+          firstClassPrice: editedFlightData.firstClassPrice,
+          seats: editedFlightData.seats,
           updatedAt: new Date().toISOString()
         });
 
@@ -789,19 +803,23 @@ const airportOptions = airports.map((airport: Airport) => ({
                           >
                             <option value="On Time">On Time</option>
                             <option value="Delayed">Delayed</option>
-                            <option value="Cancelled">Cancelled</option>
+                            <option value="In Flight">In Flight</option>
                             <option value="Landed">Landed</option>
+                            <option value="Cancelled">Cancelled</option>
+                            <option value="Boarding">Boarding</option>
                           </select>
                         ) : (
                           <span
                             className={`px-2 py-1 rounded-full text-sm ${
-                              flight.status === "On Time"
+                              flight.status === "On Time" || flight.status === "Boarding"
                                 ? "bg-green-100 text-green-800"
                                 : flight.status === "Delayed"
                                   ? "bg-yellow-100 text-yellow-800"
                                   : flight.status === "Cancelled"
                                     ? "bg-red-100 text-red-800"
-                                    : "bg-blue-100 text-blue-800"
+                                    : flight.status === "In Flight"
+                                      ? "bg-purple-100 text-purple-800"
+                                      : "bg-blue-100 text-blue-800"
                             }`}
                           >
                             {flight.status}
