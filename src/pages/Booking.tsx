@@ -122,11 +122,14 @@ const BookingPage = () => {
     }
   };
 
-  const handleSelectFlight = (flight: Flight) => {
-    navigate(`/booking-details/${flight.id}`, {
-      state: { formData, flight }
-    });
-  };
+
+const navigate = useNavigate();
+
+const handleFlightSelect = (selectedFlight, formData) => {
+  navigate(`/booking-details/${selectedFlight.id}`, {
+    state: { formData }
+  });
+};
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-center mb-8">Book a Flight</h1>
