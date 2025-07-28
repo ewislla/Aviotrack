@@ -16,7 +16,7 @@ const BookingConfirmation = () => {
 
  useEffect(() => {
   if (!location.state?.booking) {
-    navigate('/book'); // or wherever your main booking page is
+    navigate('/'); // redirect to home page
     return;
   }
 

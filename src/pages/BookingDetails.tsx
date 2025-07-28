@@ -96,7 +96,7 @@ const BookingDetails = () => {
     updateSeatStatus(flight.id, selectedSeats, 'Booked');
     
     toast.success('Booking confirmed!');
-    navigate('/confirmation', { state: { booking } });
+    navigate('/booking-confirmation', { state: { booking } });
   } catch (error) {
     console.error('Error saving booking:', error);
     toast.error('Booking failed. Please try again.');
