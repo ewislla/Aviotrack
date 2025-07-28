@@ -132,7 +132,7 @@ const BookingPage = () => {
   const availableSeats = flight.seats.filter(
     seat => seat.class === requestedClass && seat.status === 'Available'
   );
-  
+
   return availableSeats.length >= passengers;
 };
 
@@ -143,12 +143,12 @@ const handleFlightSelect = (selectedFlight, currentFormData) => {
     currentFormData.seatClass, 
     currentFormData.passengers
   );
-  
+
   if (!isAvailable) {
     toast.error(`Not enough ${currentFormData.seatClass} seats available for ${currentFormData.passengers} passengers`);
     return;
   }
-  
+
   navigate(`/booking-details/${selectedFlight.id}`, {
     state: { 
       formData: currentFormData,
@@ -156,6 +156,23 @@ const handleFlightSelect = (selectedFlight, currentFormData) => {
     }
   });
 };
+
+  const handleSelectFlight = (flight: Flight) => {
+    const isAvailable = checkFlightAvailability(
+      flight, 
+      formData.seatClass, 
+      formData.passengers
+    );
+
+    if (!isAvailable) {
+      toast.error(`Not enough ${formData.seatClass} seats available for ${formData.passengers} passengers`);
+      return;
+    }
+
+    navigate(`/booking-details/${flight.id}`, {
+      state: { formData, flight }
+    });
+  };
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-center mb-8">Book a Flight</h1>
@@ -332,12 +349,12 @@ const handleFlightSelect = (selectedFlight, currentFormData) => {
               </select>
             </div>
           </div>
-          
-          <button
-            onClick={() => handleFlightSelect(flight, formData)}
+
+           <button
+            type="submit"
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
           >
-            Select Flight
+            Search Flights
           </button>
         </form>
 
