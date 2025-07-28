@@ -76,13 +76,25 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     const fetchFlights = async () => {
-      const q = query(collection(db, "flights"), orderBy("scheduledDeparture"));
-      const snapshot = await getDocs(q);
-      const fetchedFlights = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Flight[];
-      setFlights(fetchedFlights);
+      try {
+        const q = query(collection(db, "flights"), orderBy("scheduledDeparture"));
+        const snapshot = await getDocs(q);
+        const fetchedFlights = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          // Ensure we only get flight data, not booking data
+          if (data.flightNumber && data.airline && data.origin && data.destination) {
+            return {
+              id: doc.id,
+              ...data,
+            } as Flight;
+          }
+          return null;
+        }).filter(Boolean) as Flight[];
+        setFlights(fetchedFlights);
+      } catch (error) {
+        console.error('Error fetching flights:', error);
+        toast.error('Failed to fetch flights');
+      }
     };
 
     const fetchBookings = async () => {
