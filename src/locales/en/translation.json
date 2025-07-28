@@ -1,3 +1,4 @@
+
 {
   "navbar": {
     "tagline": "Your Flight Companion",
@@ -8,9 +9,114 @@
     "guide": "Travel Guide",
     "plan": "Plan Trip",
     "contact": "Contact",
-    "ctaBanner": "Plan your perfect vacation !",
+    "ctaBanner": "Plan your perfect vacation with AI assistance!",
     "getStarted": "Get Started",
     "flightTracker": "Flight Tracker"
+  },
+  "home": {
+    "search": {
+      "title": "Track Your Flight Status",
+      "subtitle": "Get real-time updates on departure times, gate changes, and flight delays",
+      "flightNumber": "Flight Number",
+      "route": "Route",
+      "flightNumberLabel": "Enter Flight Number",
+      "flightNumberPlaceholder": "e.g., UA123, AA456",
+      "fromLabel": "From",
+      "fromPlaceholder": "Departure city",
+      "toLabel": "To",
+      "toPlaceholder": "Destination city",
+      "searchButton": "Check Status"
+    },
+    "carousel": {
+      "slide1": {
+        "title": "Your Gateway to the Sky",
+        "description": "Experience seamless flight tracking and booking with our comprehensive aviation platform"
+      },
+      "slide2": {
+        "title": "Real-Time Flight Updates",
+        "description": "Stay informed with live flight status, gate changes, and departure updates"
+      },
+      "slide3": {
+        "title": "Smart Travel Planning",
+        "description": "Plan your perfect journey with AI-powered recommendations and insights"
+      }
+    },
+    "features": {
+      "title": "Why Choose Our Platform",
+      "subtitle": "Experience the future of flight tracking and booking with cutting-edge technology",
+      "globalCoverage": {
+        "title": "Global Coverage",
+        "description": "Track flights from airlines worldwide with comprehensive airport coverage",
+        "stats": "500+ Airlines"
+      },
+      "realTimeUpdates": {
+        "title": "Real-Time Updates",
+        "description": "Get instant notifications about flight delays, gate changes, and status updates",
+        "stats": "Live Updates"
+      },
+      "secureBooking": {
+        "title": "Secure Booking",
+        "description": "Book with confidence using our encrypted, secure payment processing",
+        "stats": "100% Secure"
+      }
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "subtitle": "Three simple steps to track and book your flights",
+      "searchFlights": {
+        "title": "Search Flights",
+        "description": "Enter your flight number or route to find real-time status information"
+      },
+      "bookSecurely": {
+        "title": "Book Securely",
+        "description": "Choose your preferred flight and complete booking with secure payment"
+      },
+      "travelWithConfidence": {
+        "title": "Travel with Confidence",
+        "description": "Receive real-time updates and enjoy a smooth travel experience"
+      }
+    },
+    "destinations": {
+      "title": "Popular Destinations",
+      "subtitle": "Discover amazing places with our featured flight deals",
+      "paris": {
+        "name": "Paris, France",
+        "price": "From $499"
+      },
+      "tokyo": {
+        "name": "Tokyo, Japan",
+        "price": "From $699"
+      },
+      "newYork": {
+        "name": "New York, USA",
+        "price": "From $299"
+      }
+    },
+    "testimonials": {
+      "title": "What Our Customers Say",
+      "subtitle": "Hear from travelers who trust our platform for their flight needs",
+      "testimonial1": {
+        "name": "Sarah Johnson",
+        "role": "Business Traveler",
+        "comment": "The real-time updates saved me from missing my connecting flight. Excellent service!"
+      },
+      "testimonial2": {
+        "name": "Mike Chen",
+        "role": "Vacation Planner",
+        "comment": "Easy to use interface and reliable flight tracking. Highly recommended!"
+      },
+      "testimonial3": {
+        "name": "Emma Davis",
+        "role": "Travel Blogger",
+        "comment": "The best flight tracking app I've used. The notifications are always accurate."
+      }
+    },
+    "newsletter": {
+      "title": "Stay Updated",
+      "subtitle": "Get the latest flight deals and travel tips delivered to your inbox",
+      "placeholder": "Enter your email address",
+      "button": "Subscribe"
+    }
   },
   "flightStatus": {
     "title": "Flight Status Results",
@@ -37,7 +143,19 @@
     "flightCancelled": "Flight cancelled",
     "departsIn": "Departs in",
     "landsIn": "Lands in",
-    "shouldHaveLanded": "Flight should have landed"
+    "shouldHaveLanded": "Flight should have landed",
+    "estimatedTimeRemaining": "Estimated time remaining",
+    "onTime": "On Time",
+    "delayed": "Delayed",
+    "cancelled": "Cancelled",
+    "landed": "Landed",
+    "boarding": "Boarding",
+    "gateClosing": "Gate Closing",
+    "inFlight": "In Flight",
+    "currentLocation": "Current Location",
+    "altitude": "Altitude",
+    "speed": "Speed",
+    "weatherConditions": "Weather Conditions"
   },
   "common": {
     "loading": "Loading...",

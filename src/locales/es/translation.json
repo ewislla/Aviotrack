@@ -1,3 +1,4 @@
+
 {
   "navbar": {
     "tagline": "Tu Compañero de Vuelo",
@@ -8,9 +9,114 @@
     "guide": "Guía de Viaje",
     "plan": "Planificar Viaje",
     "contact": "Contacto",
-    "ctaBanner": "¡Planifica tus vacaciones perfectas con asistencia AI!",
+    "ctaBanner": "¡Planifica tus vacaciones perfectas con asistencia IA!",
     "getStarted": "Comenzar",
     "flightTracker": "Seguimiento de Vuelos"
+  },
+  "home": {
+    "search": {
+      "title": "Rastrea el Estado de tu Vuelo",
+      "subtitle": "Obtén actualizaciones en tiempo real sobre horarios de salida, cambios de puerta y retrasos",
+      "flightNumber": "Número de Vuelo",
+      "route": "Ruta",
+      "flightNumberLabel": "Ingresa el Número de Vuelo",
+      "flightNumberPlaceholder": "ej., UA123, AA456",
+      "fromLabel": "Desde",
+      "fromPlaceholder": "Ciudad de salida",
+      "toLabel": "Hacia",
+      "toPlaceholder": "Ciudad de destino",
+      "searchButton": "Verificar Estado"
+    },
+    "carousel": {
+      "slide1": {
+        "title": "Tu Puerta al Cielo",
+        "description": "Experimenta el seguimiento y reserva de vuelos sin problemas con nuestra plataforma integral de aviación"
+      },
+      "slide2": {
+        "title": "Actualizaciones de Vuelo en Tiempo Real",
+        "description": "Mantente informado con estado de vuelos en vivo, cambios de puerta y actualizaciones de salida"
+      },
+      "slide3": {
+        "title": "Planificación Inteligente de Viajes",
+        "description": "Planifica tu viaje perfecto con recomendaciones e información impulsadas por IA"
+      }
+    },
+    "features": {
+      "title": "Por Qué Elegir Nuestra Plataforma",
+      "subtitle": "Experimenta el futuro del seguimiento y reserva de vuelos con tecnología de vanguardia",
+      "globalCoverage": {
+        "title": "Cobertura Global",
+        "description": "Rastrea vuelos de aerolíneas de todo el mundo con cobertura integral de aeropuertos",
+        "stats": "500+ Aerolíneas"
+      },
+      "realTimeUpdates": {
+        "title": "Actualizaciones en Tiempo Real",
+        "description": "Recibe notificaciones instantáneas sobre retrasos, cambios de puerta y actualizaciones de estado",
+        "stats": "Actualizaciones en Vivo"
+      },
+      "secureBooking": {
+        "title": "Reserva Segura",
+        "description": "Reserva con confianza usando nuestro procesamiento de pagos encriptado y seguro",
+        "stats": "100% Seguro"
+      }
+    },
+    "howItWorks": {
+      "title": "Cómo Funciona",
+      "subtitle": "Tres pasos simples para rastrear y reservar tus vuelos",
+      "searchFlights": {
+        "title": "Buscar Vuelos",
+        "description": "Ingresa tu número de vuelo o ruta para encontrar información de estado en tiempo real"
+      },
+      "bookSecurely": {
+        "title": "Reservar de Forma Segura",
+        "description": "Elige tu vuelo preferido y completa la reserva con pago seguro"
+      },
+      "travelWithConfidence": {
+        "title": "Viajar con Confianza",
+        "description": "Recibe actualizaciones en tiempo real y disfruta de una experiencia de viaje fluida"
+      }
+    },
+    "destinations": {
+      "title": "Destinos Populares",
+      "subtitle": "Descubre lugares increíbles con nuestras ofertas de vuelos destacadas",
+      "paris": {
+        "name": "París, Francia",
+        "price": "Desde $499"
+      },
+      "tokyo": {
+        "name": "Tokio, Japón",
+        "price": "Desde $699"
+      },
+      "newYork": {
+        "name": "Nueva York, EUA",
+        "price": "Desde $299"
+      }
+    },
+    "testimonials": {
+      "title": "Lo Que Dicen Nuestros Clientes",
+      "subtitle": "Escucha a los viajeros que confían en nuestra plataforma para sus necesidades de vuelo",
+      "testimonial1": {
+        "name": "Sarah Johnson",
+        "role": "Viajera de Negocios",
+        "comment": "Las actualizaciones en tiempo real me salvaron de perder mi vuelo de conexión. ¡Excelente servicio!"
+      },
+      "testimonial2": {
+        "name": "Mike Chen",
+        "role": "Planificador de Vacaciones",
+        "comment": "Interfaz fácil de usar y seguimiento confiable de vuelos. ¡Altamente recomendado!"
+      },
+      "testimonial3": {
+        "name": "Emma Davis",
+        "role": "Bloguera de Viajes",
+        "comment": "La mejor aplicación de seguimiento de vuelos que he usado. Las notificaciones son siempre precisas."
+      }
+    },
+    "newsletter": {
+      "title": "Mantente Actualizado",
+      "subtitle": "Recibe las últimas ofertas de vuelos y consejos de viaje en tu bandeja de entrada",
+      "placeholder": "Ingresa tu dirección de email",
+      "button": "Suscribirse"
+    }
   },
   "flightStatus": {
     "title": "Resultados del Estado del Vuelo",
@@ -37,7 +143,19 @@
     "flightCancelled": "Vuelo cancelado",
     "departsIn": "Sale en",
     "landsIn": "Aterriza en",
-    "shouldHaveLanded": "El vuelo debería haber aterrizado"
+    "shouldHaveLanded": "El vuelo debería haber aterrizado",
+    "estimatedTimeRemaining": "Tiempo estimado restante",
+    "onTime": "A Tiempo",
+    "delayed": "Retrasado",
+    "cancelled": "Cancelado",
+    "landed": "Aterrizado",
+    "boarding": "Abordando",
+    "gateClosing": "Cerrando Puerta",
+    "inFlight": "En Vuelo",
+    "currentLocation": "Ubicación Actual",
+    "altitude": "Altitud",
+    "speed": "Velocidad",
+    "weatherConditions": "Condiciones Climáticas"
   },
   "common": {
     "loading": "Cargando...",
