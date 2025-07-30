@@ -1,8 +1,9 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from 'react-router-dom';
 import { Plane, User, Mail, Users, CreditCard } from "lucide-react";
 import Select from "react-select";
-import { mockFlights } from "../data";
+
 import { Flight } from "../types";
 import { Airport } from "../types"; // Add Airport type import
 import { toast } from "react-hot-toast";
@@ -104,21 +105,21 @@ const BookingPage = () => {
 
   useEffect(() => {
     // Check if there's a preselected flight from flight status page
-    if (location.state?.preselectedFlight) {
-      const preselectedFlight = location.state.preselectedFlight;
+    if ((location as any).state?.preselectedFlight) {
+      const preselectedFlight = (location as any).state.preselectedFlight;
       setAvailableFlights([preselectedFlight]);
       setSearched(true);
       
       // Pre-fill form data if provided
-      if (location.state.origin && location.state.destination) {
+      if ((location as any).state.origin && (location as any).state.destination) {
         setFormData(prev => ({
           ...prev,
-          from: location.state.origin,
-          to: location.state.destination
+          from: (location as any).state.origin,
+          to: (location as any).state.destination
         }));
       }
     }
-  }, [location.state]);
+ }, [(location as any).state]);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,16 +148,16 @@ const BookingPage = () => {
     }
   };
 
-  const checkFlightAvailability = (flight, requestedClass, passengers) => {
+  const checkFlightAvailability = (flight: any, requestedClass: any, passengers: any) => {
   const availableSeats = flight.seats.filter(
-    seat => seat.class === requestedClass && seat.status === 'Available'
+ (seat: any) => seat.class === requestedClass && seat.status === 'Available'
   );
 
   return availableSeats.length >= passengers;
 };
 
 // Use it in your flight selection:
-const handleFlightSelect = (selectedFlight, currentFormData) => {
+const handleFlightSelect = (selectedFlight: any, currentFormData: any) => {
   const isAvailable = checkFlightAvailability(
     selectedFlight, 
     currentFormData.seatClass, 

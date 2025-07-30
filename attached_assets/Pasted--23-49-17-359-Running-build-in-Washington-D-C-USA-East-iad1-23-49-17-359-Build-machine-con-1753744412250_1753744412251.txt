@@ -1,0 +1,51 @@
+[23:49:17.359] Running build in Washington, D.C., USA (East) – iad1
+[23:49:17.359] Build machine configuration: 2 cores, 8 GB
+[23:49:17.385] Cloning github.com/ewislla/Aviotrack (Branch: main, Commit: 81980cc)
+[23:49:17.524] Previous build caches not available
+[23:49:17.712] Cloning completed: 326.000ms
+[23:49:19.430] Running "vercel build"
+[23:49:20.082] Vercel CLI 44.5.0
+[23:49:21.119] Installing dependencies...
+[23:49:32.094] 
+[23:49:32.095] added 452 packages in 11s
+[23:49:32.098] 
+[23:49:32.098] 73 packages are looking for funding
+[23:49:32.098]   run `npm fund` for details
+[23:49:32.152] Running "npm run build"
+[23:49:32.395] 
+[23:49:32.396] > vite-react-typescript-starter@0.0.0 build
+[23:49:32.397] > tsc && vite build
+[23:49:32.397] 
+[23:49:39.929] src/pages/Booking.tsx(107,18): error TS2339: Property 'state' does not exist on type 'Location'.
+[23:49:39.930] src/pages/Booking.tsx(108,42): error TS2339: Property 'state' does not exist on type 'Location'.
+[23:49:39.930] src/pages/Booking.tsx(113,20): error TS2339: Property 'state' does not exist on type 'Location'.
+[23:49:39.930] src/pages/Booking.tsx(113,45): error TS2339: Property 'state' does not exist on type 'Location'.
+[23:49:39.930] src/pages/Booking.tsx(116,26): error TS2339: Property 'state' does not exist on type 'Location'.
+[23:49:39.930] src/pages/Booking.tsx(117,24): error TS2339: Property 'state' does not exist on type 'Location'.
+[23:49:39.930] src/pages/Booking.tsx(121,16): error TS2339: Property 'state' does not exist on type 'Location'.
+[23:49:39.930] src/pages/Booking.tsx(150,36): error TS7006: Parameter 'flight' implicitly has an 'any' type.
+[23:49:39.930] src/pages/Booking.tsx(150,44): error TS7006: Parameter 'requestedClass' implicitly has an 'any' type.
+[23:49:39.931] src/pages/Booking.tsx(150,60): error TS7006: Parameter 'passengers' implicitly has an 'any' type.
+[23:49:39.931] src/pages/Booking.tsx(152,5): error TS7006: Parameter 'seat' implicitly has an 'any' type.
+[23:49:39.931] src/pages/Booking.tsx(159,29): error TS7006: Parameter 'selectedFlight' implicitly has an 'any' type.
+[23:49:39.932] src/pages/Booking.tsx(159,45): error TS7006: Parameter 'currentFormData' implicitly has an 'any' type.
+[23:49:39.932] src/pages/BookingConfirmation.tsx(75,63): error TS2339: Property 'email' does not exist on type 'never'.
+[23:49:39.932] src/pages/BookingConfirmation.tsx(104,64): error TS2339: Property 'pnr' does not exist on type 'never'.
+[23:49:39.933] src/pages/BookingConfirmation.tsx(111,55): error TS2339: Property 'flight' does not exist on type 'never'.
+[23:49:39.933] src/pages/BookingConfirmation.tsx(113,37): error TS2339: Property 'flight' does not exist on type 'never'.
+[23:49:39.933] src/pages/BookingConfirmation.tsx(118,55): error TS2339: Property 'flight' does not exist on type 'never'.
+[23:49:39.933] src/pages/BookingConfirmation.tsx(120,37): error TS2339: Property 'flight' does not exist on type 'never'.
+[23:49:39.934] src/pages/BookingConfirmation.tsx(127,72): error TS2339: Property 'fullName' does not exist on type 'never'.
+[23:49:39.934] src/pages/BookingConfirmation.tsx(128,73): error TS2339: Property 'email' does not exist on type 'never'.
+[23:49:39.934] src/pages/BookingConfirmation.tsx(129,73): error TS2339: Property 'seatClass' does not exist on type 'never'.
+[23:49:39.934] src/pages/BookingConfirmation.tsx(130,80): error TS2339: Property 'seatNumbers' does not exist on type 'never'.
+[23:49:39.934] src/pages/BookingConfirmation.tsx(131,78): error TS2339: Property 'passengers' does not exist on type 'never'.
+[23:49:39.934] src/pages/BookingConfirmation.tsx(136,75): error TS2339: Property 'flight' does not exist on type 'never'.
+[23:49:39.934] src/pages/BookingConfirmation.tsx(137,74): error TS2339: Property 'flight' does not exist on type 'never'.
+[23:49:39.934] src/pages/BookingConfirmation.tsx(138,76): error TS2339: Property 'flight' does not exist on type 'never'.
+[23:49:39.934] src/pages/BookingConfirmation.tsx(139,76): error TS2339: Property 'flight' does not exist on type 'never'.
+[23:49:39.935] src/pages/BookingConfirmation.tsx(140,72): error TS2339: Property 'flight' does not exist on type 'never'.
+[23:49:39.935] src/pages/BookingConfirmation.tsx(146,63): error TS2339: Property 'price' does not exist on type 'never'.
+[23:49:39.960] Error: Command "npm run build" exited with 2
+[23:49:40.237] 
+[23:49:44.186] Exiting build container

@@ -72,7 +72,7 @@ const BookingConfirmation = () => {
     if (booking) {
       sendConfirmationEmail(booking).then(success => {
         if (success) {
-          toast.success(`Confirmation email sent to ${booking.email}`);
+          toast.success('Confirmation email sent to ${(booking as any).email}');
         }
       });
     }
@@ -101,49 +101,49 @@ const BookingConfirmation = () => {
         <div className="bg-gray-50 rounded-lg p-6 mb-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-semibold">Booking Details</h2>
-            <span className="text-blue-600 font-mono">{booking.pnr}</span>
+            <span className="text-blue-600 font-mono">{(booking as any).pnr}</span>
           </div>
 
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-gray-600">From</p>
-                <p className="font-semibold">{booking.flight.origin}</p>
+                <p className="font-semibold">{(booking as any).flight.origin}</p>
                 <p className="text-sm text-gray-500">
-                  {new Date(booking.flight.scheduledDeparture).toLocaleString()}
+                  {new Date((booking as any).flight.scheduledDeparture).toLocaleString()}
                 </p>
               </div>
               <div>
                 <p className="text-gray-600">To</p>
-                <p className="font-semibold">{booking.flight.destination}</p>
+                <p className="font-semibold">{(booking as any).flight.destination}</p>
                 <p className="text-sm text-gray-500">
-                  {new Date(booking.flight.scheduledArrival).toLocaleString()}
+                  {new Date((booking as any).flight.scheduledArrival).toLocaleString()}
                 </p>
               </div>
             </div>
 
             <div className="border-t border-gray-200 pt-4">
               <h3 className="font-semibold mb-2">Passenger Information</h3>
-              <p><span className="text-gray-600">Name:</span> {booking.fullName}</p>
-              <p><span className="text-gray-600">Email:</span> {booking.email}</p>
-              <p><span className="text-gray-600">Class:</span> {booking.seatClass}</p>
-              <p><span className="text-gray-600">Seat Numbers:</span> {booking.seatNumbers.join(', ')}</p>
-              <p><span className="text-gray-600">Passengers:</span> {booking.passengers}</p>
+              <p><span className="text-gray-600">Name:</span> {(booking as any).fullName}</p>
+              <p><span className="text-gray-600">Email:</span> {(booking as any).email}</p>
+              <p><span className="text-gray-600">Class:</span> {(booking as any).seatClass}</p>
+              <p><span className="text-gray-600">Seat Numbers:</span> {(booking as any).seatNumbers.join(', ')}</p>
+              <p><span className="text-gray-600">Passengers:</span> {(booking as any).passengers}</p>
             </div>
 
             <div className="border-t border-gray-200 pt-4">
               <h3 className="font-semibold mb-2">Flight Information</h3>
-              <p><span className="text-gray-600">Airline:</span> {booking.flight.airline}</p>
-              <p><span className="text-gray-600">Flight:</span> {booking.flight.flightNumber}</p>
-              <p><span className="text-gray-600">Aircraft:</span> {booking.flight.aircraftType}</p>
-              <p><span className="text-gray-600">Terminal:</span> {booking.flight.terminal}</p>
-              <p><span className="text-gray-600">Gate:</span> {booking.flight.gate}</p>
+              <p><span className="text-gray-600">Airline:</span> {(booking as any).flight.airline}</p>
+              <p><span className="text-gray-600">Flight:</span> {(booking as any).flight.flightNumber}</p>
+              <p><span className="text-gray-600">Aircraft:</span> {(booking as any).flight.aircraftType}</p>
+              <p><span className="text-gray-600">Terminal:</span> {(booking as any).flight.terminal}</p>
+              <p><span className="text-gray-600">Gate:</span> {(booking as any).flight.gate}</p>
             </div>
 
             <div className="border-t border-gray-200 pt-4">
               <div className="flex justify-between items-center">
                 <span className="font-semibold">Total Price</span>
-                <span className="text-xl font-bold">${booking.price}</span>
+                <span className="text-xl font-bold">${(booking as any).price}</span>
               </div>
             </div>
           </div>
