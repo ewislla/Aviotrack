@@ -107,7 +107,6 @@ const ContactUs = () => {
                 <div>
                   <p className="font-medium">Phone</p>
                   <p className="text-gray-600">+16824375362 </p>
-                 
                 </div>
               </div>
               <div className="flex items-start space-x-4">
@@ -117,7 +116,6 @@ const ContactUs = () => {
                   <p className="text-gray-600">
                     Aviotrackglobal@aircraftmail.com
                   </p>
-                 
                 </div>
               </div>
               <div className="flex items-start space-x-4">
@@ -125,11 +123,11 @@ const ContactUs = () => {
                 <div>
                   <p className="font-medium">Address</p>
                   <p className="text-gray-600">
-                    123 Aviation Way
+                    1600 Smith St,
                     <br />
-                    Terminal 1, Suite 456
+                    Houston, TX 77002
                     <br />
-                    New York, NY 10001
+                    United States
                   </p>
                 </div>
               </div>
