@@ -104,7 +104,6 @@ const BookingPage = () => {
   );
 
   useEffect(() => {
-    // Check if there's a preselected flight from flight status page
     if ((location as any).state?.preselectedFlight) {
       const preselectedFlight = (location as any).state.preselectedFlight;
       setAvailableFlights([preselectedFlight]);
